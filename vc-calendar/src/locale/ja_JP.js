@@ -22,5 +22,5 @@ export default {
   previousDecade: '前の年代',
   nextDecade: '次の年代',
   previousCentury: '前の世紀',
-  nextCentury: '次の世紀'
+  nextCentury: '次の世紀',
 };

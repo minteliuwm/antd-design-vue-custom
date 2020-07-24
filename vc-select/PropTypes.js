@@ -1,6 +1,6 @@
 import PropTypes from '../_util/vue-types';
 
-export var SelectPropTypes = {
+export const SelectPropTypes = {
   defaultActiveFirstOption: PropTypes.bool,
   multiple: PropTypes.bool,
   filterOption: PropTypes.any,
@@ -55,5 +55,5 @@ export var SelectPropTypes = {
   dropdownMatchSelectWidth: PropTypes.bool,
   dropdownMenuStyle: PropTypes.object,
   notFoundContent: PropTypes.oneOfType([String, Number]),
-  tabIndex: PropTypes.oneOfType([String, Number])
+  tabIndex: PropTypes.oneOfType([String, Number]),
 };

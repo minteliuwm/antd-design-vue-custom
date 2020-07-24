@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Eelmine dekaad',
   nextDecade: 'Järgmine dekaad',
   previousCentury: 'Eelmine sajand',
-  nextCentury: 'Järgmine sajand'
+  nextCentury: 'Järgmine sajand',
 };

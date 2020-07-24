@@ -1,4 +1,4 @@
-var initialState = {
+const initialState = {
   animating: false,
   autoplaying: null,
   currentDirection: 0,
@@ -20,7 +20,7 @@ var initialState = {
   swiping: false,
   touchObject: { startX: 0, startY: 0, curX: 0, curY: 0 },
   trackStyle: {},
-  trackWidth: 0
+  trackWidth: 0,
 };
 
 export default initialState;

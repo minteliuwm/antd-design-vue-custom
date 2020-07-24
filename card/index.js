@@ -6,7 +6,7 @@ Card.Meta = Meta;
 Card.Grid = Grid;
 
 /* istanbul ignore next */
-Card.install = function (Vue) {
+Card.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Card.name, Card);
   Vue.component(Meta.name, Meta);

@@ -1,5 +1,5 @@
-var locale = {
-  placeholder: 'Vali aeg'
+const locale = {
+  placeholder: 'Vali aeg',
 };
 
 export default locale;

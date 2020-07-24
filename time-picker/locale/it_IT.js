@@ -1,5 +1,5 @@
-var locale = {
-  placeholder: "Selezionare l'orario"
+const locale = {
+  placeholder: "Selezionare l'orario",
 };
 
 export default locale;

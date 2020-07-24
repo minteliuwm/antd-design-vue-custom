@@ -1,86 +1,92 @@
 import Notification from '../vc-notification';
 import Icon from '../icon';
 
-var defaultDuration = 3;
-var defaultTop = void 0;
-var messageInstance = void 0;
-var key = 1;
-var prefixCls = 'ant-message';
-var transitionName = 'move-up';
-var getContainer = function getContainer() {
-  return document.body;
-};
-var maxCount = void 0;
+let defaultDuration = 3;
+let defaultTop;
+let messageInstance;
+let key = 1;
+let prefixCls = 'ant-message';
+let transitionName = 'move-up';
+let getContainer = () => document.body;
+let maxCount;
 
 function getMessageInstance(callback) {
   if (messageInstance) {
     callback(messageInstance);
     return;
   }
-  Notification.newInstance({
-    prefixCls: prefixCls,
-    transitionName: transitionName,
-    style: { top: defaultTop }, // 覆盖原来的样式
-    getContainer: getContainer,
-    maxCount: maxCount
-  }, function (instance) {
-    if (messageInstance) {
-      callback(messageInstance);
-      return;
-    }
-    messageInstance = instance;
-    callback(instance);
-  });
+  Notification.newInstance(
+    {
+      prefixCls,
+      transitionName,
+      style: { top: defaultTop }, // 覆盖原来的样式
+      getContainer,
+      maxCount,
+    },
+    instance => {
+      if (messageInstance) {
+        callback(messageInstance);
+        return;
+      }
+      messageInstance = instance;
+      callback(instance);
+    },
+  );
 }
 
 // type NoticeType = 'info' | 'success' | 'error' | 'warning' | 'loading';
 
 function notice(args) {
-  var duration = args.duration !== undefined ? args.duration : defaultDuration;
-  var iconType = {
+  const duration = args.duration !== undefined ? args.duration : defaultDuration;
+  const iconType = {
     info: 'info-circle',
     success: 'check-circle',
     error: 'close-circle',
     warning: 'exclamation-circle',
-    loading: 'loading'
+    loading: 'loading',
   }[args.type];
 
-  var target = key++;
-  var closePromise = new Promise(function (resolve) {
-    var callback = function callback() {
+  const target = args.key || key++;
+  const closePromise = new Promise(resolve => {
+    const callback = () => {
       if (typeof args.onClose === 'function') {
         args.onClose();
       }
       return resolve(true);
     };
-    getMessageInstance(function (instance) {
+    getMessageInstance(instance => {
       instance.notice({
         key: target,
-        duration: duration,
+        duration,
         style: {},
-        content: function content(h) {
-          return h(
-            'div',
-            {
-              'class': prefixCls + '-custom-content' + (args.type ? ' ' + prefixCls + '-' + args.type : '')
-            },
-            [args.icon ? typeof args.icon === 'function' ? args.icon(h) : args.icon : iconType ? h(Icon, {
-              attrs: { type: iconType, theme: iconType === 'loading' ? 'outlined' : 'filled' }
-            }) : '', h('span', [typeof args.content === 'function' ? args.content(h) : args.content])]
+        content: h => {
+          const iconNode = (
+            <Icon type={iconType} theme={iconType === 'loading' ? 'outlined' : 'filled'} />
+          );
+          const switchIconNode = iconType ? iconNode : '';
+          return (
+            <div
+              class={`${prefixCls}-custom-content${args.type ? ` ${prefixCls}-${args.type}` : ''}`}
+            >
+              {args.icon
+                ? typeof args.icon === 'function'
+                  ? args.icon(h)
+                  : args.icon
+                : switchIconNode}
+              <span>{typeof args.content === 'function' ? args.content(h) : args.content}</span>
+            </div>
           );
         },
-        onClose: callback
+        onClose: callback,
       });
     });
   });
-  var result = function result() {
+  const result = () => {
     if (messageInstance) {
       messageInstance.removeNotice(target);
     }
   };
-  result.then = function (filled, rejected) {
-    return closePromise.then(filled, rejected);
-  };
+  result.then = (filled, rejected) => closePromise.then(filled, rejected);
   result.promise = closePromise;
   return result;
 }
@@ -88,6 +94,10 @@ function notice(args) {
 // type ConfigContent = React.ReactNode | string;
 // type ConfigDuration = number | (() => void);
 // export type ConfigOnClose = () => void;
+
+function isArgsProps(content) {
+  return Object.prototype.toString.call(content) === '[object Object]' && !!content.content;
+}
 
 // export interface ConfigOptions {
 //   top?: number;
@@ -97,9 +107,9 @@ function notice(args) {
 //   transitionName?: string;
 // }
 
-var api = {
+const api = {
   open: notice,
-  config: function config(options) {
+  config(options) {
     if (options.top !== undefined) {
       defaultTop = options.top;
       messageInstance = null; // delete messageInstance for new defaultTop
@@ -122,21 +132,24 @@ var api = {
       messageInstance = null;
     }
   },
-  destroy: function destroy() {
+  destroy() {
     if (messageInstance) {
       messageInstance.destroy();
       messageInstance = null;
     }
-  }
+  },
 };
 
-['success', 'info', 'warning', 'error', 'loading'].forEach(function (type) {
-  api[type] = function (content, duration, onClose) {
+['success', 'info', 'warning', 'error', 'loading'].forEach(type => {
+  api[type] = (content, duration, onClose) => {
+    if (isArgsProps(content)) {
+      return api.open({ ...content, type });
+    }
     if (typeof duration === 'function') {
       onClose = duration;
       duration = undefined;
     }
-    return api.open({ content: content, duration: duration, type: type, onClose: onClose });
+    return api.open({ content, duration, type, onClose });
   };
 });
 

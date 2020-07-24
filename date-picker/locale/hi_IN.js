@@ -1,14 +1,16 @@
-import _extends from 'babel-runtime/helpers/extends';
-import CalendarLocale from '../../vc-calendar/src/locale/he_IL';
-import TimePickerLocale from '../../time-picker/locale/he_IL';
+import CalendarLocale from '../../vc-calendar/src/locale/hi_IN';
+import TimePickerLocale from '../../time-picker/locale/hi_IN';
 
 // Merge into a locale object
-var locale = {
-  lang: _extends({
+const locale = {
+  lang: {
     placeholder: 'तारीख़ चुनें',
-    rangePlaceholder: ['प्रारंभ तिथि', 'समाप्ति तिथि']
-  }, CalendarLocale),
-  timePickerLocale: _extends({}, TimePickerLocale)
+    rangePlaceholder: ['प्रारंभ तिथि', 'समाप्ति तिथि'],
+    ...CalendarLocale,
+  },
+  timePickerLocale: {
+    ...TimePickerLocale,
+  },
 };
 
 // All settings at:

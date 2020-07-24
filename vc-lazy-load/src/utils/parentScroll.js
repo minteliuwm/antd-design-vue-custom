@@ -1,5 +1,5 @@
-var style = function style(element, prop) {
-  var styleVal = '';
+const style = (element, prop) => {
+  let styleVal = '';
   if (typeof getComputedStyle !== 'undefined') {
     styleVal = window.getComputedStyle(element, null).getPropertyValue(prop);
   } else {
@@ -8,16 +8,15 @@ var style = function style(element, prop) {
   return styleVal;
 };
 
-var overflow = function overflow(element) {
-  return style(element, 'overflow') + style(element, 'overflow-y') + style(element, 'overflow-x');
-};
+const overflow = element =>
+  style(element, 'overflow') + style(element, 'overflow-y') + style(element, 'overflow-x');
 
-var scrollParent = function scrollParent(element) {
+const scrollParent = element => {
   if (!(element instanceof window.HTMLElement)) {
     return window;
   }
 
-  var parent = element;
+  let parent = element;
 
   while (parent) {
     if (parent === document.body || parent === document.documentElement) {

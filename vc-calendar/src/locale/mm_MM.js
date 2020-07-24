@@ -24,5 +24,5 @@ export default {
   previousDecade: 'ယခင် ဆယ်စုနှစ်',
   nextDecade: 'နောက် ဆယ်စုနှစ်',
   previousCentury: 'ယခင် ရာစုနှစ်',
-  nextCentury: 'နောက် ရာစုနှစ်'
+  nextCentury: 'နောက် ရာစုနှစ်',
 };

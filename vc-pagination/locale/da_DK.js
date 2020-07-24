@@ -11,5 +11,5 @@ export default {
   prev_5: 'Forrige 5 Sider',
   next_5: 'Næste 5 Sider',
   prev_3: 'Forrige 3 Sider',
-  next_3: 'Næste 3 Sider'
+  next_3: 'Næste 3 Sider',
 };

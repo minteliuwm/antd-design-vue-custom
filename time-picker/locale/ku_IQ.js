@@ -1,5 +1,5 @@
-var locale = {
-  placeholder: 'Demê hilbijêre'
+const locale = {
+  placeholder: 'Demê hilbijêre',
 };
 
 export default locale;

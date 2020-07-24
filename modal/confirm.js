@@ -1,44 +1,40 @@
-import _extends from 'babel-runtime/helpers/extends';
 import Vue from 'vue';
 import ConfirmDialog from './ConfirmDialog';
 import { destroyFns } from './Modal';
 import Base from '../base';
+import Omit from 'omit.js';
 
 export default function confirm(config) {
-  var div = document.createElement('div');
-  var el = document.createElement('div');
+  const div = document.createElement('div');
+  const el = document.createElement('div');
   div.appendChild(el);
   document.body.appendChild(div);
-  var currentConfig = _extends({}, config, { close: close, visible: true });
+  let currentConfig = { ...Omit(config, ['parentContext']), close, visible: true };
 
-  var confirmDialogInstance = null;
-  var confirmDialogProps = { props: {} };
-  function close() {
-    destroy.apply(undefined, arguments);
+  let confirmDialogInstance = null;
+  const confirmDialogProps = { props: {} };
+  function close(...args) {
+    destroy(...args);
   }
   function update(newConfig) {
-    currentConfig = _extends({}, currentConfig, newConfig);
+    currentConfig = {
+      ...currentConfig,
+      ...newConfig,
+    };
     confirmDialogProps.props = currentConfig;
   }
-  function destroy() {
+  function destroy(...args) {
     if (confirmDialogInstance && div.parentNode) {
       confirmDialogInstance.$destroy();
       confirmDialogInstance = null;
       div.parentNode.removeChild(div);
     }
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var triggerCancel = args.some(function (param) {
-      return param && param.triggerCancel;
-    });
+    const triggerCancel = args.some(param => param && param.triggerCancel);
     if (config.onCancel && triggerCancel) {
-      config.onCancel.apply(config, args);
+      config.onCancel(...args);
     }
-    for (var i = 0; i < destroyFns.length; i++) {
-      var fn = destroyFns[i];
+    for (let i = 0; i < destroyFns.length; i++) {
+      const fn = destroyFns[i];
       if (fn === close) {
         destroyFns.splice(i, 1);
         break;
@@ -48,19 +44,18 @@ export default function confirm(config) {
 
   function render(props) {
     confirmDialogProps.props = props;
-    var V = Base.Vue || Vue;
+    const V = Base.Vue || Vue;
     return new V({
-      el: el,
-      data: function data() {
-        return { confirmDialogProps: confirmDialogProps };
+      el,
+      parent: config.parentContext,
+      data() {
+        return { confirmDialogProps };
       },
-      render: function render() {
-        var h = arguments[0];
-
+      render() {
         // 先解构，避免报错，原因不详
-        var cdProps = _extends({}, this.confirmDialogProps);
-        return h(ConfirmDialog, cdProps);
-      }
+        const cdProps = { ...this.confirmDialogProps };
+        return <ConfirmDialog {...cdProps} />;
+      },
     });
   }
 
@@ -68,6 +63,6 @@ export default function confirm(config) {
   destroyFns.push(close);
   return {
     destroy: close,
-    update: update
+    update,
   };
 }

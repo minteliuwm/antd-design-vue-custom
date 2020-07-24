@@ -3,22 +3,18 @@
  * properties to Elements.
  */
 
-export var inBrowser = typeof window !== 'undefined';
-export var UA = inBrowser && window.navigator.userAgent.toLowerCase();
-export var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
+export const inBrowser = typeof window !== 'undefined';
+export const UA = inBrowser && window.navigator.userAgent.toLowerCase();
+export const isIE9 = UA && UA.indexOf('msie 9.0') > 0;
 function makeMap(str, expectsLowerCase) {
-  var map = Object.create(null);
-  var list = str.split(',');
-  for (var i = 0; i < list.length; i++) {
+  const map = Object.create(null);
+  const list = str.split(',');
+  for (let i = 0; i < list.length; i++) {
     map[list[i]] = true;
   }
-  return expectsLowerCase ? function (val) {
-    return map[val.toLowerCase()];
-  } : function (val) {
-    return map[val];
-  };
+  return expectsLowerCase ? val => map[val.toLowerCase()] : val => map[val];
 }
-var isTextInputType = makeMap('text,number,password,search,email,tel,url');
+const isTextInputType = makeMap('text,number,password,search,email,tel,url');
 
 function onCompositionStart(e) {
   e.target.composing = true;
@@ -32,7 +28,7 @@ function onCompositionEnd(e) {
 }
 
 function trigger(el, type) {
-  var e = document.createEvent('HTMLEvents');
+  const e = document.createEvent('HTMLEvents');
   e.initEvent(type, true, true);
   el.dispatchEvent(e);
 }
@@ -40,8 +36,8 @@ function trigger(el, type) {
 /* istanbul ignore if */
 if (isIE9) {
   // http://www.matts411.com/post/internet-explorer-9-oninput/
-  document.addEventListener('selectionchange', function () {
-    var el = document.activeElement;
+  document.addEventListener('selectionchange', () => {
+    const el = document.activeElement;
     if (el && el.vmodel) {
       trigger(el, 'input');
     }
@@ -50,7 +46,7 @@ if (isIE9) {
 
 export function antInput(Vue) {
   return Vue.directive('ant-input', {
-    inserted: function inserted(el, binding, vnode) {
+    inserted(el, binding, vnode) {
       if (vnode.tag === 'textarea' || isTextInputType(el.type)) {
         if (!binding.modifiers || !binding.modifiers.lazy) {
           el.addEventListener('compositionstart', onCompositionStart);
@@ -66,12 +62,12 @@ export function antInput(Vue) {
           }
         }
       }
-    }
+    },
   });
 }
 
 export default {
-  install: function install(Vue) {
+  install: Vue => {
     antInput(Vue);
-  }
+  },
 };

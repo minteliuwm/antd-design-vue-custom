@@ -1,13 +1,12 @@
-import _defineProperty from 'babel-runtime/helpers/defineProperty';
 import PropTypes from '../../../_util/vue-types';
 import BaseMixin from '../../../_util/BaseMixin';
 import { hasProp } from '../../../_util/props-util';
 import moment from 'moment';
-import { isAllowedDate as _isAllowedDate, getTodayTime } from '../util/index';
+import { isAllowedDate, getTodayTime } from '../util/index';
 function noop() {}
 
 export function getNowByCurrentStateValue(value) {
-  var ret = void 0;
+  let ret;
   if (value) {
     ret = getTodayTime(value);
   } else {
@@ -17,97 +16,107 @@ export function getNowByCurrentStateValue(value) {
 }
 function isMoment(value) {
   if (Array.isArray(value)) {
-    return value.length === 0 || value.findIndex(function (val) {
-      return val === undefined || moment.isMoment(val);
-    }) !== -1;
+    return (
+      value.length === 0 || value.findIndex(val => val === undefined || moment.isMoment(val)) !== -1
+    );
   } else {
     return value === undefined || moment.isMoment(value);
   }
 }
-var MomentType = PropTypes.custom(isMoment);
-var CalendarMixin = {
+const MomentType = PropTypes.custom(isMoment);
+const CalendarMixin = {
   mixins: [BaseMixin],
   name: 'CalendarMixinWrapper',
   props: {
     value: MomentType,
-    defaultValue: MomentType
+    defaultValue: MomentType,
   },
 
-  data: function data() {
-    var props = this.$props;
-    var sValue = props.value || props.defaultValue || getNowByCurrentStateValue();
+  data() {
+    const props = this.$props;
+    const sValue = props.value || props.defaultValue || getNowByCurrentStateValue();
     return {
-      sValue: sValue,
-      sSelectedValue: props.selectedValue || props.defaultSelectedValue
+      sValue,
+      sSelectedValue: props.selectedValue || props.defaultSelectedValue,
     };
   },
-
   watch: {
-    value: function value(val) {
-      var sValue = val || this.defaultValue || getNowByCurrentStateValue(this.sValue);
+    value(val) {
+      const sValue = val || this.defaultValue || getNowByCurrentStateValue(this.sValue);
       this.setState({
-        sValue: sValue
+        sValue,
       });
     },
-    selectedValue: function selectedValue(val) {
+    selectedValue(val) {
       this.setState({
-        sSelectedValue: val
+        sSelectedValue: val,
       });
-    }
+    },
   },
   methods: {
-    onSelect: function onSelect(value, cause) {
+    onSelect(value, cause) {
       if (value) {
         this.setValue(value);
       }
       this.setSelectedValue(value, cause);
     },
-    renderRoot: function renderRoot(newProps) {
-      var _className;
 
-      var h = this.$createElement;
+    renderRoot(newProps) {
+      const props = this.$props;
+      const prefixCls = props.prefixCls;
 
-      var props = this.$props;
-      var prefixCls = props.prefixCls;
-
-      var className = (_className = {}, _defineProperty(_className, prefixCls, 1), _defineProperty(_className, prefixCls + '-hidden', !props.visible), _defineProperty(_className, newProps['class'], !!newProps['class']), _className);
-      return h(
-        'div',
-        { ref: 'rootInstance', 'class': className, attrs: { tabIndex: '0' },
-          on: {
-            'keydown': this.onKeyDown || noop
-          }
-        },
-        [newProps.children]
+      const className = {
+        [prefixCls]: 1,
+        [`${prefixCls}-hidden`]: !props.visible,
+        // [props.className]: !!props.className,
+        [newProps.class]: !!newProps.class,
+      };
+      return (
+        <div
+          ref="rootInstance"
+          class={className}
+          tabIndex="0"
+          onKeydown={this.onKeyDown || noop}
+          onBlur={this.onBlur || noop}
+        >
+          {newProps.children}
+        </div>
       );
     },
-    setSelectedValue: function setSelectedValue(selectedValue, cause) {
+
+    setSelectedValue(selectedValue, cause) {
       // if (this.isAllowedDate(selectedValue)) {
       if (!hasProp(this, 'selectedValue')) {
         this.setState({
-          sSelectedValue: selectedValue
+          sSelectedValue: selectedValue,
         });
       }
       this.__emit('select', selectedValue, cause);
       // }
     },
-    setValue: function setValue(value) {
-      var originalValue = this.sValue;
+
+    setValue(value) {
+      const originalValue = this.sValue;
       if (!hasProp(this, 'value')) {
         this.setState({
-          sValue: value
+          sValue: value,
         });
       }
-      if (originalValue && value && !originalValue.isSame(value) || !originalValue && value || originalValue && !value) {
+      if (
+        (originalValue && value && !originalValue.isSame(value)) ||
+        (!originalValue && value) ||
+        (originalValue && !value)
+      ) {
         this.__emit('change', value);
       }
     },
-    isAllowedDate: function isAllowedDate(value) {
-      var disabledDate = this.disabledDate;
-      var disabledTime = this.disabledTime;
-      return _isAllowedDate(value, disabledDate, disabledTime);
-    }
-  }
+
+    isAllowedDate(value) {
+      const disabledDate = this.disabledDate;
+      const disabledTime = this.disabledTime;
+      return isAllowedDate(value, disabledDate, disabledTime);
+    },
+  },
 };
 
 export default CalendarMixin;

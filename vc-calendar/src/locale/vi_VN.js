@@ -24,5 +24,5 @@ export default {
   previousDecade: 'Thập kỷ trước',
   nextDecade: 'Thập kỷ sau',
   previousCentury: 'Thế kỷ trước',
-  nextCentury: 'Thế kỷ sau'
+  nextCentury: 'Thế kỷ sau',
 };

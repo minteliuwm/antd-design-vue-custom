@@ -1,5 +1,5 @@
-var locale = {
-  placeholder: 'Velja tíma'
+const locale = {
+  placeholder: 'Velja tíma',
 };
 
 export default locale;

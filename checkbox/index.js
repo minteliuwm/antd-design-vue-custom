@@ -5,7 +5,7 @@ import Base from '../base';
 Checkbox.Group = CheckboxGroup;
 
 /* istanbul ignore next */
-Checkbox.install = function (Vue) {
+Checkbox.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Checkbox.name, Checkbox);
   Vue.component(CheckboxGroup.name, CheckboxGroup);

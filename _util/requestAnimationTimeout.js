@@ -1,12 +1,12 @@
-import getRequestAnimationFrame, { cancelRequestAnimationFrame as caf } from './getRequestAnimationFrame';
-var raf = getRequestAnimationFrame();
+import getRequestAnimationFrame, {
+  cancelRequestAnimationFrame as caf,
+} from './getRequestAnimationFrame';
+const raf = getRequestAnimationFrame();
 
-export var cancelAnimationTimeout = function cancelAnimationTimeout(frame) {
-  return caf(frame.id);
-};
+export const cancelAnimationTimeout = frame => caf(frame.id);
 
-export var requestAnimationTimeout = function requestAnimationTimeout(callback, delay) {
-  var start = Date.now();
+export const requestAnimationTimeout = (callback, delay) => {
+  const start = Date.now();
   function timeout() {
     if (Date.now() - start >= delay) {
       callback.call();
@@ -15,8 +15,8 @@ export var requestAnimationTimeout = function requestAnimationTimeout(callback, 
     }
   }
 
-  var frame = {
-    id: raf(timeout)
+  const frame = {
+    id: raf(timeout),
   };
 
   return frame;

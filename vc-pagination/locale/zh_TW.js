@@ -11,5 +11,5 @@ export default {
   prev_5: '向前 5 頁',
   next_5: '向後 5 頁',
   prev_3: '向前 3 頁',
-  next_3: '向後 3 頁'
+  next_3: '向後 3 頁',
 };

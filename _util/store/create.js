@@ -1,11 +1,10 @@
-import _extends from "babel-runtime/helpers/extends";
 export default function create(initialState) {
-  var state = initialState;
-  var listeners = [];
+  let state = initialState;
+  const listeners = [];
 
   function setState(partial) {
-    state = _extends({}, state, partial);
-    for (var i = 0; i < listeners.length; i++) {
+    state = { ...state, ...partial };
+    for (let i = 0; i < listeners.length; i++) {
       listeners[i]();
     }
   }
@@ -18,14 +17,14 @@ export default function create(initialState) {
     listeners.push(listener);
 
     return function unsubscribe() {
-      var index = listeners.indexOf(listener);
+      const index = listeners.indexOf(listener);
       listeners.splice(index, 1);
     };
   }
 
   return {
-    setState: setState,
-    getState: getState,
-    subscribe: subscribe
+    setState,
+    getState,
+    subscribe,
   };
 }

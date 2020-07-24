@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Edellinen vuosikymmen',
   nextDecade: 'Seuraava vuosikymmen',
   previousCentury: 'Edellinen vuosisata',
-  nextCentury: 'Seuraava vuosisata'
+  nextCentury: 'Seuraava vuosisata',
 };

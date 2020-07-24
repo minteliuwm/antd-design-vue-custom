@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Föreg årtionde',
   nextDecade: 'Nästa årtionde',
   previousCentury: 'Föreg århundrade',
-  nextCentury: 'Nästa århundrade'
+  nextCentury: 'Nästa århundrade',
 };

@@ -5,7 +5,7 @@ import Base from '../base';
 Collapse.Panel = CollapsePanel;
 
 /* istanbul ignore next */
-Collapse.install = function (Vue) {
+Collapse.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Collapse.name, Collapse);
   Vue.component(CollapsePanel.name, CollapsePanel);

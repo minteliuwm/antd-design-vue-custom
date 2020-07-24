@@ -11,5 +11,5 @@ export default {
   prev_5: '5 páginas anteriores',
   next_5: '5 próximas páginas',
   prev_3: '3 páginas anteriores',
-  next_3: '3 próximas páginas'
+  next_3: '3 próximas páginas',
 };

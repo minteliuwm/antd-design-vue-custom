@@ -8,6 +8,7 @@ export default {
   year: 'Rok',
   timeSelect: 'Vybrať čas',
   dateSelect: 'Vybrať dátum',
+  weekSelect: 'Vybrať týždeň',
   monthSelect: 'Vybrať mesiac',
   yearSelect: 'Vybrať rok',
   decadeSelect: 'Vybrať dekádu',
@@ -23,5 +24,5 @@ export default {
   previousDecade: 'Predchádzajúca dekáda',
   nextDecade: 'Nasledujúca dekáda',
   previousCentury: 'Predchádzajúce storočie',
-  nextCentury: 'Nasledujúce storočie'
+  nextCentury: 'Nasledujúce storočie',
 };

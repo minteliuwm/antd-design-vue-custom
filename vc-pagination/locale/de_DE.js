@@ -11,5 +11,5 @@ export default {
   prev_5: '5 Seiten zurück',
   next_5: '5 Seiten vor',
   prev_3: '3 Seiten zurück',
-  next_3: '3 Seiten vor'
+  next_3: '3 Seiten vor',
 };

@@ -11,5 +11,5 @@ export default {
   prev_5: 'Edelliset 5 sivua',
   next_5: 'Seuraavat 5 sivua',
   prev_3: 'Edelliset 3 sivua',
-  next_3: 'Seuraavat 3 sivua'
+  next_3: 'Seuraavat 3 sivua',
 };

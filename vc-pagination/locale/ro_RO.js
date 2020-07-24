@@ -11,5 +11,5 @@ export default {
   prev_5: '5 Pagini Anterioare',
   next_5: '5 Pagini Următoare',
   prev_3: '3 Pagini Anterioare',
-  next_3: '3 Pagini Următoare'
+  next_3: '3 Pagini Următoare',
 };

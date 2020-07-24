@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Dècada anterior',
   nextDecade: 'Dècada següent',
   previousCentury: 'Segle anterior',
-  nextCentury: 'Segle següent'
+  nextCentury: 'Segle següent',
 };

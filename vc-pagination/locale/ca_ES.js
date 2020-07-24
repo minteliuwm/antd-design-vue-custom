@@ -11,5 +11,5 @@ export default {
   prev_5: '5 pàgines prèvies',
   next_5: '5 pàgines següents',
   prev_3: '3 pàgines prèvies',
-  next_3: '3 pàgines següents'
+  next_3: '3 pàgines següents',
 };

@@ -3,11 +3,11 @@ export default function getScroll(target, top) {
     return 0;
   }
 
-  var prop = top ? 'pageYOffset' : 'pageXOffset';
-  var method = top ? 'scrollTop' : 'scrollLeft';
-  var isWindow = target === window;
+  const prop = top ? 'pageYOffset' : 'pageXOffset';
+  const method = top ? 'scrollTop' : 'scrollLeft';
+  const isWindow = target === window;
 
-  var ret = isWindow ? target[prop] : target[method];
+  let ret = isWindow ? target[prop] : target[method];
   // ie6,7,8 standard mode
   if (isWindow && typeof ret !== 'number') {
     ret = window.document.documentElement[method];

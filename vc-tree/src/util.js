@@ -1,16 +1,12 @@
-import _toConsumableArray from 'babel-runtime/helpers/toConsumableArray';
-import _slicedToArray from 'babel-runtime/helpers/slicedToArray';
-import _typeof from 'babel-runtime/helpers/typeof';
-import _objectWithoutProperties from 'babel-runtime/helpers/objectWithoutProperties';
 /* eslint no-loop-func: 0*/
 import warning from 'warning';
 import omit from 'omit.js';
 import TreeNode from './TreeNode';
 import { getSlotOptions, getOptionProps } from '../../_util/props-util';
-var DRAG_SIDE_RANGE = 0.25;
-var DRAG_MIN_GAP = 2;
+const DRAG_SIDE_RANGE = 0.25;
+const DRAG_MIN_GAP = 2;
 
-var onlyTreeNodeWarned = false;
+let onlyTreeNodeWarned = false;
 
 export function warnOnlyTreeNode() {
   if (onlyTreeNodeWarned) return;
@@ -20,8 +16,8 @@ export function warnOnlyTreeNode() {
 }
 
 export function arrDel(list, value) {
-  var clone = list.slice();
-  var index = clone.indexOf(value);
+  const clone = list.slice();
+  const index = clone.indexOf(value);
   if (index >= 0) {
     clone.splice(index, 1);
   }
@@ -29,7 +25,7 @@ export function arrDel(list, value) {
 }
 
 export function arrAdd(list, value) {
-  var clone = list.slice();
+  const clone = list.slice();
   if (clone.indexOf(value) === -1) {
     clone.push(value);
   }
@@ -41,54 +37,49 @@ export function posToArr(pos) {
 }
 
 export function getPosition(level, index) {
-  return level + '-' + index;
+  return `${level}-${index}`;
 }
 
 export function isTreeNode(node) {
   return getSlotOptions(node).isTreeNode;
 }
 
-export function getNodeChildren() {
-  var children = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
+export function getNodeChildren(children = []) {
   return children.filter(isTreeNode);
 }
 
 export function isCheckDisabled(node) {
-  var _ref = getOptionProps(node) || {},
-      disabled = _ref.disabled,
-      disableCheckbox = _ref.disableCheckbox;
-
-  return !!(disabled || disableCheckbox);
+  const { disabled, disableCheckbox, checkable } = getOptionProps(node) || {};
+  return !!(disabled || disableCheckbox) || checkable === false;
 }
 
 export function traverseTreeNodes(treeNodes, callback) {
   function processNode(node, index, parent) {
-    var children = node ? node.componentOptions.children : treeNodes;
-    var pos = node ? getPosition(parent.pos, index) : 0;
+    const children = node ? node.componentOptions.children : treeNodes;
+    const pos = node ? getPosition(parent.pos, index) : 0;
 
     // Filter children
-    var childList = getNodeChildren(children);
+    const childList = getNodeChildren(children);
 
     // Process node if is not root
     if (node) {
-      var key = node.key;
+      let key = node.key;
       if (!key && (key === undefined || key === null)) {
         key = pos;
       }
-      var data = {
-        node: node,
-        index: index,
-        pos: pos,
-        key: key,
-        parentPos: parent.node ? parent.pos : null
+      const data = {
+        node,
+        index,
+        pos,
+        key,
+        parentPos: parent.node ? parent.pos : null,
       };
       callback(data);
     }
 
     // Process children node
-    childList.forEach(function (subNode, subIndex) {
-      processNode(subNode, subIndex, { node: node, pos: pos });
+    childList.forEach((subNode, subIndex) => {
+      processNode(subNode, subIndex, { node, pos });
     });
   }
 
@@ -99,11 +90,8 @@ export function traverseTreeNodes(treeNodes, callback) {
  * Use `rc-util` `toArray` to get the children list which keeps the key.
  * And return single node if children is only one(This can avoid `key` missing check).
  */
-export function mapChildren() {
-  var children = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-  var func = arguments[1];
-
-  var list = children.map(func);
+export function mapChildren(children = [], func) {
+  const list = children.map(func);
   if (list.length === 1) {
     return list[0];
   }
@@ -111,15 +99,10 @@ export function mapChildren() {
 }
 
 export function getDragNodesKeys(treeNodes, node) {
-  var _getOptionProps = getOptionProps(node),
-      eventKey = _getOptionProps.eventKey,
-      pos = _getOptionProps.pos;
+  const { eventKey, pos } = getOptionProps(node);
+  const dragNodesKeys = [];
 
-  var dragNodesKeys = [];
-
-  traverseTreeNodes(treeNodes, function (_ref2) {
-    var key = _ref2.key;
-
+  traverseTreeNodes(treeNodes, ({ key }) => {
     dragNodesKeys.push(key);
   });
   dragNodesKeys.push(eventKey || pos);
@@ -127,18 +110,14 @@ export function getDragNodesKeys(treeNodes, node) {
 }
 
 export function calcDropPosition(event, treeNode) {
-  var clientY = event.clientY;
-
-  var _treeNode$$refs$selec = treeNode.$refs.selectHandle.getBoundingClientRect(),
-      top = _treeNode$$refs$selec.top,
-      bottom = _treeNode$$refs$selec.bottom,
-      height = _treeNode$$refs$selec.height;
-
-  var des = Math.max(height * DRAG_SIDE_RANGE, DRAG_MIN_GAP);
+  const { clientY } = event;
+  const { top, bottom, height } = treeNode.$refs.selectHandle.getBoundingClientRect();
+  const des = Math.max(height * DRAG_SIDE_RANGE, DRAG_MIN_GAP);
 
   if (clientY <= top + des) {
     return -1;
-  } else if (clientY >= bottom - des) {
+  }
+  if (clientY >= bottom - des) {
     return 1;
   }
   return 0;
@@ -155,8 +134,7 @@ export function calcSelectedKeys(selectedKeys, props) {
     return undefined;
   }
 
-  var multiple = props.multiple;
-
+  const { multiple } = props;
   if (multiple) {
     return selectedKeys.slice();
   }
@@ -176,35 +154,23 @@ export function calcSelectedKeys(selectedKeys, props) {
 //   return keyList.map(key => String(key))
 // }
 
-var internalProcessProps = function internalProcessProps() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
+const internalProcessProps = (props = {}) => {
   return {
     props: omit(props, ['on', 'key', 'class', 'className', 'style']),
     on: props.on || {},
-    'class': props['class'] || props.className,
+    class: props.class || props.className,
     style: props.style,
-    key: props.key
+    key: props.key,
   };
 };
-export function convertDataToTree(h, treeData, processer) {
+export function convertDataToTree(h, treeData, processor) {
   if (!treeData) return [];
 
-  var _ref3 = processer || {},
-      _ref3$processProps = _ref3.processProps,
-      processProps = _ref3$processProps === undefined ? internalProcessProps : _ref3$processProps;
-
-  var list = Array.isArray(treeData) ? treeData : [treeData];
-  return list.map(function (_ref4) {
-    var children = _ref4.children,
-        props = _objectWithoutProperties(_ref4, ['children']);
-
-    var childrenNodes = convertDataToTree(h, children, processer);
-    return h(
-      TreeNode,
-      processProps(props),
-      [childrenNodes]
-    );
+  const { processProps = internalProcessProps } = processor || {};
+  const list = Array.isArray(treeData) ? treeData : [treeData];
+  return list.map(({ children, ...props }) => {
+    const childrenNodes = convertDataToTree(h, children, processor);
+    return <TreeNode {...processProps(props)}>{childrenNodes}</TreeNode>;
   });
 }
 
@@ -214,31 +180,24 @@ export function convertDataToTree(h, treeData, processer) {
  * @param treeNodes
  * @param processTreeEntity  User can customize the entity
  */
-export function convertTreeToEntities(treeNodes) {
-  var _ref5 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-      initWrapper = _ref5.initWrapper,
-      processEntity = _ref5.processEntity,
-      onProcessFinished = _ref5.onProcessFinished;
-
-  var posEntities = new Map();
-  var keyEntities = new Map();
-  var wrapper = {
-    posEntities: posEntities,
-    keyEntities: keyEntities
+export function convertTreeToEntities(
+  treeNodes,
+  { initWrapper, processEntity, onProcessFinished } = {},
+) {
+  const posEntities = new Map();
+  const keyEntities = new Map();
+  let wrapper = {
+    posEntities,
+    keyEntities,
   };
 
   if (initWrapper) {
     wrapper = initWrapper(wrapper) || wrapper;
   }
 
-  traverseTreeNodes(treeNodes, function (item) {
-    var node = item.node,
-        index = item.index,
-        pos = item.pos,
-        key = item.key,
-        parentPos = item.parentPos;
-
-    var entity = { node: node, index: index, key: key, pos: pos };
+  traverseTreeNodes(treeNodes, item => {
+    const { node, index, pos, key, parentPos } = item;
+    const entity = { node, index, key, pos };
 
     posEntities.set(pos, entity);
     keyEntities.set(key, entity);
@@ -271,17 +230,17 @@ export function parseCheckedKeys(keys) {
   }
 
   // Convert keys to object format
-  var keyProps = void 0;
+  let keyProps;
   if (Array.isArray(keys)) {
     // [Legacy] Follow the api doc
     keyProps = {
       checkedKeys: keys,
-      halfCheckedKeys: undefined
+      halfCheckedKeys: undefined,
     };
-  } else if ((typeof keys === 'undefined' ? 'undefined' : _typeof(keys)) === 'object') {
+  } else if (typeof keys === 'object') {
     keyProps = {
       checkedKeys: keys.checked || undefined,
-      halfCheckedKeys: keys.halfChecked || undefined
+      halfCheckedKeys: keys.halfChecked || undefined,
     };
   } else {
     warning(false, '`checkedKeys` is not an array or an object');
@@ -303,17 +262,15 @@ export function parseCheckedKeys(keys) {
  * @param checkStatus   Can pass current checked status for process (usually for uncheck operation)
  * @returns {{checkedKeys: [], halfCheckedKeys: []}}
  */
-export function conductCheck(keyList, isCheck, keyEntities) {
-  var checkStatus = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+export function conductCheck(keyList, isCheck, keyEntities, checkStatus = {}) {
+  const checkedKeys = new Map();
+  const halfCheckedKeys = new Map(); // Record the key has some child checked (include child half checked)
 
-  var checkedKeys = new Map();
-  var halfCheckedKeys = new Map(); // Record the key has some child checked (include child half checked)
-
-  (checkStatus.checkedKeys || []).forEach(function (key) {
+  (checkStatus.checkedKeys || []).forEach(key => {
     checkedKeys.set(key, true);
   });
 
-  (checkStatus.halfCheckedKeys || []).forEach(function (key) {
+  (checkStatus.halfCheckedKeys || []).forEach(key => {
     halfCheckedKeys.set(key, true);
   });
 
@@ -321,31 +278,26 @@ export function conductCheck(keyList, isCheck, keyEntities) {
   function conductUp(key) {
     if (checkedKeys.get(key) === isCheck) return;
 
-    var entity = keyEntities.get(key);
+    const entity = keyEntities.get(key);
     if (!entity) return;
 
-    var children = entity.children,
-        parent = entity.parent,
-        node = entity.node;
-
+    const { children, parent, node } = entity;
 
     if (isCheckDisabled(node)) return;
 
     // Check child node checked status
-    var everyChildChecked = true;
-    var someChildChecked = false; // Child checked or half checked
+    let everyChildChecked = true;
+    let someChildChecked = false; // Child checked or half checked
 
-    (children || []).filter(function (child) {
-      return !isCheckDisabled(child.node);
-    }).forEach(function (_ref6) {
-      var childKey = _ref6.key;
+    (children || [])
+      .filter(child => !isCheckDisabled(child.node))
+      .forEach(({ key: childKey }) => {
+        const childChecked = checkedKeys.get(childKey);
+        const childHalfChecked = halfCheckedKeys.get(childKey);
 
-      var childChecked = checkedKeys.get(childKey);
-      var childHalfChecked = halfCheckedKeys.get(childKey);
-
-      if (childChecked || childHalfChecked) someChildChecked = true;
-      if (!childChecked) everyChildChecked = false;
-    });
+        if (childChecked || childHalfChecked) someChildChecked = true;
+        if (!childChecked) everyChildChecked = false;
+      });
 
     // Update checked status
     if (isCheck) {
@@ -364,43 +316,38 @@ export function conductCheck(keyList, isCheck, keyEntities) {
   function conductDown(key) {
     if (checkedKeys.get(key) === isCheck) return;
 
-    var entity = keyEntities.get(key);
+    const entity = keyEntities.get(key);
     if (!entity) return;
 
-    var children = entity.children,
-        node = entity.node;
-
+    const { children, node } = entity;
 
     if (isCheckDisabled(node)) return;
 
     checkedKeys.set(key, isCheck);
 
-    (children || []).forEach(function (child) {
+    (children || []).forEach(child => {
       conductDown(child.key);
     });
   }
 
   function conduct(key) {
-    var entity = keyEntities.get(key);
+    const entity = keyEntities.get(key);
 
     if (!entity) {
-      warning(false, '\'' + key + '\' does not exist in the tree.');
+      warning(false, `'${key}' does not exist in the tree.`);
       return;
     }
-    var children = entity.children,
-        parent = entity.parent,
-        node = entity.node;
-
+    const { children, parent, node } = entity;
     checkedKeys.set(key, isCheck);
 
     if (isCheckDisabled(node)) return;
 
     // Conduct down
-    (children || []).filter(function (child) {
-      return !isCheckDisabled(child.node);
-    }).forEach(function (child) {
-      conductDown(child.key);
-    });
+    (children || [])
+      .filter(child => !isCheckDisabled(child.node))
+      .forEach(child => {
+        conductDown(child.key);
+      });
 
     // Conduct up
     if (parent) {
@@ -408,83 +355,30 @@ export function conductCheck(keyList, isCheck, keyEntities) {
     }
   }
 
-  (keyList || []).forEach(function (key) {
+  (keyList || []).forEach(key => {
     conduct(key);
   });
 
-  var checkedKeyList = [];
-  var halfCheckedKeyList = [];
+  const checkedKeyList = [];
+  const halfCheckedKeyList = [];
 
   // Fill checked list
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = checkedKeys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _ref7 = _step.value;
-
-      var _ref8 = _slicedToArray(_ref7, 2);
-
-      var key = _ref8[0];
-      var value = _ref8[1];
-
-      if (value) {
-        checkedKeyList.push(key);
-      }
-    }
-
-    // Fill half checked list
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator['return']) {
-        _iterator['return']();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
+  for (const [key, value] of checkedKeys) {
+    if (value) {
+      checkedKeyList.push(key);
     }
   }
 
-  var _iteratorNormalCompletion2 = true;
-  var _didIteratorError2 = false;
-  var _iteratorError2 = undefined;
-
-  try {
-    for (var _iterator2 = halfCheckedKeys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-      var _ref9 = _step2.value;
-
-      var _ref10 = _slicedToArray(_ref9, 2);
-
-      var _key = _ref10[0];
-      var _value = _ref10[1];
-
-      if (!checkedKeys.get(_key) && _value) {
-        halfCheckedKeyList.push(_key);
-      }
-    }
-  } catch (err) {
-    _didIteratorError2 = true;
-    _iteratorError2 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-        _iterator2['return']();
-      }
-    } finally {
-      if (_didIteratorError2) {
-        throw _iteratorError2;
-      }
+  // Fill half checked list
+  for (const [key, value] of halfCheckedKeys) {
+    if (!checkedKeys.get(key) && value) {
+      halfCheckedKeyList.push(key);
     }
   }
 
   return {
     checkedKeys: checkedKeyList,
-    halfCheckedKeys: halfCheckedKeyList
+    halfCheckedKeys: halfCheckedKeyList,
   };
 }
 
@@ -494,32 +388,30 @@ export function conductCheck(keyList, isCheck, keyEntities) {
  * @param keyEntities
  */
 export function conductExpandParent(keyList, keyEntities) {
-  var expandedKeys = new Map();
+  const expandedKeys = new Map();
 
   function conductUp(key) {
     if (expandedKeys.get(key)) return;
 
-    var entity = keyEntities.get(key);
+    const entity = keyEntities.get(key);
     if (!entity) return;
 
     expandedKeys.set(key, true);
 
-    var parent = entity.parent,
-        node = entity.node;
-
-
-    if (isCheckDisabled(node)) return;
+    const { parent, node } = entity;
+    const props = getOptionProps(node);
+    if (props && props.disabled) return;
 
     if (parent) {
       conductUp(parent.key);
     }
   }
 
-  (keyList || []).forEach(function (key) {
+  (keyList || []).forEach(key => {
     conductUp(key);
   });
 
-  return [].concat(_toConsumableArray(expandedKeys.keys()));
+  return [...expandedKeys.keys()];
 }
 
 /**
@@ -527,7 +419,7 @@ export function conductExpandParent(keyList, keyEntities) {
  * @param {object} props
  */
 export function getDataAndAria(props) {
-  return Object.keys(props).reduce(function (prev, key) {
+  return Object.keys(props).reduce((prev, key) => {
     if (key.substr(0, 5) === 'data-' || key.substr(0, 5) === 'aria-') {
       prev[key] = props[key];
     }

@@ -24,5 +24,5 @@ export default {
   previousDecade: 'העשור הקודם',
   nextDecade: 'העשור הבא',
   previousCentury: 'המאה הקודמת',
-  nextCentury: 'המאה הבאה'
+  nextCentury: 'המאה הבאה',
 };

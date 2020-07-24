@@ -15,7 +15,7 @@ Input.TextArea = TextArea;
 Input.Password = Password;
 
 /* istanbul ignore next */
-Input.install = function (Vue) {
+Input.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Input.name, Input);
   Vue.component(Input.Group.name, Input.Group);

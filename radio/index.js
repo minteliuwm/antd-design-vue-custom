@@ -7,7 +7,7 @@ Radio.Group = Group;
 Radio.Button = Button;
 
 /* istanbul ignore next */
-Radio.install = function (Vue) {
+Radio.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Radio.name, Radio);
   Vue.component(Radio.Group.name, Radio.Group);

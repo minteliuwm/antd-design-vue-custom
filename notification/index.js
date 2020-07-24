@@ -1,34 +1,16 @@
-import _extends from 'babel-runtime/helpers/extends';
 import Notification from '../vc-notification';
 import Icon from '../icon';
 
-// export type NotificationPlacement = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+const notificationInstance = {};
+let defaultDuration = 4.5;
+let defaultTop = '24px';
+let defaultBottom = '24px';
+let defaultPlacement = 'topRight';
+let defaultGetContainer = () => document.body;
+let defaultCloseIcon = null;
 
-// export type IconType = 'success' | 'info' | 'error' | 'warning';
-
-var notificationInstance = {};
-var defaultDuration = 4.5;
-var defaultTop = '24px';
-var defaultBottom = '24px';
-var defaultPlacement = 'topRight';
-var defaultGetContainer = function defaultGetContainer() {
-  return document.body;
-};
-
-// export interface ConfigProps {
-//   top?: number;
-//   bottom?: number;
-//   duration?: number;
-//   placement?: NotificationPlacement;
-//   getContainer?: () => HTMLElement;
-// }
 function setNotificationConfig(options) {
-  var duration = options.duration,
-      placement = options.placement,
-      bottom = options.bottom,
-      top = options.top,
-      getContainer = options.getContainer;
-
+  const { duration, placement, bottom, top, getContainer, closeIcon } = options;
   if (duration !== undefined) {
     defaultDuration = duration;
   }
@@ -36,190 +18,179 @@ function setNotificationConfig(options) {
     defaultPlacement = placement;
   }
   if (bottom !== undefined) {
-    defaultBottom = typeof bottom === 'number' ? bottom + 'px' : bottom;
+    defaultBottom = typeof bottom === 'number' ? `${bottom}px` : bottom;
   }
   if (top !== undefined) {
-    defaultTop = typeof top === 'number' ? top + 'px' : top;
+    defaultTop = typeof top === 'number' ? `${top}px` : top;
   }
   if (getContainer !== undefined) {
     defaultGetContainer = getContainer;
   }
+  if (closeIcon !== undefined) {
+    defaultCloseIcon = closeIcon;
+  }
 }
 
-function getPlacementStyle(placement) {
-  var style = void 0;
+function getPlacementStyle(placement, top = defaultTop, bottom = defaultBottom) {
+  let style;
   switch (placement) {
     case 'topLeft':
       style = {
         left: 0,
-        top: defaultTop,
-        bottom: 'auto'
+        top,
+        bottom: 'auto',
       };
       break;
     case 'topRight':
       style = {
         right: 0,
-        top: defaultTop,
-        bottom: 'auto'
+        top,
+        bottom: 'auto',
       };
       break;
     case 'bottomLeft':
       style = {
         left: 0,
         top: 'auto',
-        bottom: defaultBottom
+        bottom,
       };
       break;
     default:
       style = {
         right: 0,
         top: 'auto',
-        bottom: defaultBottom
+        bottom,
       };
       break;
   }
   return style;
 }
 
-function getNotificationInstance(prefixCls, placement, callback) {
-  var cacheKey = prefixCls + '-' + placement;
+function getNotificationInstance(
+  {
+    prefixCls,
+    placement = defaultPlacement,
+    getContainer = defaultGetContainer,
+    top,
+    bottom,
+    closeIcon = defaultCloseIcon,
+  },
+  callback,
+) {
+  const cacheKey = `${prefixCls}-${placement}`;
   if (notificationInstance[cacheKey]) {
     callback(notificationInstance[cacheKey]);
     return;
   }
-  Notification.newInstance({
-    prefixCls: prefixCls,
-    'class': prefixCls + '-' + placement,
-    style: getPlacementStyle(placement),
-    getContainer: defaultGetContainer,
-    closeIcon: function closeIcon(h) {
-      return h(Icon, { 'class': prefixCls + '-close-icon', attrs: { type: 'close' }
-      });
-    } // eslint-disable-line
-  }, function (notification) {
-    notificationInstance[cacheKey] = notification;
-    callback(notification);
-  });
+  Notification.newInstance(
+    {
+      prefixCls,
+      class: `${prefixCls}-${placement}`,
+      style: getPlacementStyle(placement, top, bottom),
+      getContainer,
+      closeIcon: h => {
+        const icon = typeof closeIcon === 'function' ? closeIcon(h) : closeIcon;
+        const closeIconToRender = (
+          <span class={`${prefixCls}-close-x`}>
+            {icon || <Icon class={`${prefixCls}-close-icon`} type="close" />}
+          </span>
+        );
+        return closeIconToRender;
+      },
+    },
+    notification => {
+      notificationInstance[cacheKey] = notification;
+      callback(notification);
+    },
+  );
 }
 
-var typeToIcon = {
+const typeToIcon = {
   success: 'check-circle-o',
   info: 'info-circle-o',
   error: 'close-circle-o',
-  warning: 'exclamation-circle-o'
+  warning: 'exclamation-circle-o',
 };
 
-// export interface ArgsProps {
-//   message: React.ReactNode;
-//   description: React.ReactNode;
-//   btn?: React.ReactNode;
-//   key?: string;
-//   onClose?: () => void;
-//   duration?: number | null;
-//   icon?: React.ReactNode;
-//   placement?: NotificationPlacement;
-//   style?: React.CSSProperties;
-//   prefixCls?: string;
-//   className?: string;
-//   readonly type?: IconType;
-// }
 function notice(args) {
-  var icon = args.icon,
-      type = args.type,
-      description = args.description,
-      placement = args.placement,
-      message = args.message,
-      btn = args.btn;
+  const { icon, type, description, message, btn } = args;
+  const outerPrefixCls = args.prefixCls || 'ant-notification';
+  const prefixCls = `${outerPrefixCls}-notice`;
+  const duration = args.duration === undefined ? defaultDuration : args.duration;
 
-  var outerPrefixCls = args.prefixCls || 'ant-notification';
-  var prefixCls = outerPrefixCls + '-notice';
-  var duration = args.duration === undefined ? defaultDuration : args.duration;
-
-  var iconNode = null;
+  let iconNode = null;
   if (icon) {
-    iconNode = function iconNode(h) {
-      return h(
-        'span',
-        { 'class': prefixCls + '-icon' },
-        [typeof icon === 'function' ? icon(h) : icon]
-      );
-    };
+    iconNode = h => (
+      <span class={`${prefixCls}-icon`}>{typeof icon === 'function' ? icon(h) : icon}</span>
+    );
   } else if (type) {
-    var iconType = typeToIcon[type];
-    iconNode = function iconNode(h) {
-      return h(Icon, { 'class': prefixCls + '-icon ' + prefixCls + '-icon-' + type, attrs: { type: iconType }
-      });
-    }; // eslint-disable-line
+    const iconType = typeToIcon[type];
+    iconNode = h => <Icon class={`${prefixCls}-icon ${prefixCls}-icon-${type}`} type={iconType} />; // eslint-disable-line
   }
-
-  getNotificationInstance(outerPrefixCls, placement || defaultPlacement, function (notification) {
-    notification.notice({
-      content: function content(h) {
-        return h(
-          'div',
-          { 'class': iconNode ? prefixCls + '-with-icon' : '' },
-          [iconNode && iconNode(h), h(
-            'div',
-            { 'class': prefixCls + '-message' },
-            [!description && iconNode ? h('span', { 'class': prefixCls + '-message-single-line-auto-margin' }) : null, typeof message === 'function' ? message(h) : message]
-          ), h(
-            'div',
-            { 'class': prefixCls + '-description' },
-            [typeof description === 'function' ? description(h) : description]
-          ), btn ? h(
-            'span',
-            { 'class': prefixCls + '-btn' },
-            [typeof btn === 'function' ? btn(h) : btn]
-          ) : null]
-        );
-      },
-      duration: duration,
-      closable: true,
-      onClose: args.onClose,
-      onClick: args.onClick,
-      key: args.key,
-      style: args.style || {},
-      'class': args['class']
-    });
-  });
+  const { placement, top, bottom, getContainer, closeIcon } = args;
+  getNotificationInstance(
+    {
+      prefixCls: outerPrefixCls,
+      placement,
+      top,
+      bottom,
+      getContainer,
+      closeIcon,
+    },
+    notification => {
+      notification.notice({
+        content: h => (
+          <div class={iconNode ? `${prefixCls}-with-icon` : ''}>
+            {iconNode && iconNode(h)}
+            <div class={`${prefixCls}-message`}>
+              {!description && iconNode ? (
+                <span class={`${prefixCls}-message-single-line-auto-margin`} />
+              ) : null}
+              {typeof message === 'function' ? message(h) : message}
+            </div>
+            <div class={`${prefixCls}-description`}>
+              {typeof description === 'function' ? description(h) : description}
+            </div>
+            {btn ? (
+              <span class={`${prefixCls}-btn`}>{typeof btn === 'function' ? btn(h) : btn}</span>
+            ) : null}
+          </div>
+        ),
+        duration,
+        closable: true,
+        onClose: args.onClose,
+        onClick: args.onClick,
+        key: args.key,
+        style: args.style || {},
+        class: args.class,
+      });
+    },
+  );
 }
 
-var api = {
+const api = {
   open: notice,
-  close: function close(key) {
-    Object.keys(notificationInstance).forEach(function (cacheKey) {
-      return notificationInstance[cacheKey].removeNotice(key);
-    });
+  close(key) {
+    Object.keys(notificationInstance).forEach(cacheKey =>
+      notificationInstance[cacheKey].removeNotice(key),
+    );
   },
-
   config: setNotificationConfig,
-  destroy: function destroy() {
-    Object.keys(notificationInstance).forEach(function (cacheKey) {
+  destroy() {
+    Object.keys(notificationInstance).forEach(cacheKey => {
       notificationInstance[cacheKey].destroy();
       delete notificationInstance[cacheKey];
     });
-  }
+  },
 };
 
-['success', 'info', 'warning', 'error'].forEach(function (type) {
-  api[type] = function (args) {
-    return api.open(_extends({}, args, {
-      type: type
-    }));
-  };
+['success', 'info', 'warning', 'error'].forEach(type => {
+  api[type] = args =>
+    api.open({
+      ...args,
+      type,
+    });
 });
 
 api.warn = api.warning;
-
-// export interface NotificationApi {
-//   success(args: ArgsProps): void;
-//   error(args: ArgsProps): void;
-//   info(args: ArgsProps): void;
-//   warn(args: ArgsProps): void;
-//   warning(args: ArgsProps): void;
-//   open(args: ArgsProps): void;
-//   close(key: string): void;
-//   config(options: ConfigProps): void;
-//   destroy(): void;
-// }
 export default api;

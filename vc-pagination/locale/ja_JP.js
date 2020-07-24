@@ -11,5 +11,5 @@ export default {
   prev_5: '前 5ページ',
   next_5: '次 5ページ',
   prev_3: '前 3ページ',
-  next_3: '次 3ページ'
+  next_3: '次 3ページ',
 };

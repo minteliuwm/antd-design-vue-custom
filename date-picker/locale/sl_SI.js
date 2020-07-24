@@ -1,8 +1,7 @@
-import _extends from 'babel-runtime/helpers/extends';
 import TimePickerLocale from '../../time-picker/locale/sl_SI';
 
 // Merge into a locale object
-var locale = {
+const locale = {
   lang: {
     placeholder: 'Izberite datum',
     rangePlaceholder: ['Začetni datum', 'Končni datum'],
@@ -31,9 +30,11 @@ var locale = {
     previousDecade: 'Prejšnje desetletje',
     nextDecade: 'Naslednje desetletje',
     previousCentury: 'Zadnje stoletje',
-    nextCentury: 'Naslednje stoletje'
+    nextCentury: 'Naslednje stoletje',
   },
-  timePickerLocale: _extends({}, TimePickerLocale)
+  timePickerLocale: {
+    ...TimePickerLocale,
+  },
 };
 
 // All settings at:

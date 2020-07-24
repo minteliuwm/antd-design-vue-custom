@@ -3,10 +3,10 @@
  * rather than to the viewport as it is the case with .getBoundingClientRect().
  */
 export default function getElementPosition(element) {
-  var rect = element.getBoundingClientRect();
+  const rect = element.getBoundingClientRect();
 
   return {
     top: rect.top + window.pageYOffset,
-    left: rect.left + window.pageXOffset
+    left: rect.left + window.pageXOffset,
   };
 }

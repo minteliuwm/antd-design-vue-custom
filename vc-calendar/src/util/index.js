@@ -1,20 +1,19 @@
-import _extends from 'babel-runtime/helpers/extends';
 import moment from 'moment';
 
-var defaultDisabledTime = {
-  disabledHours: function disabledHours() {
+const defaultDisabledTime = {
+  disabledHours() {
     return [];
   },
-  disabledMinutes: function disabledMinutes() {
+  disabledMinutes() {
     return [];
   },
-  disabledSeconds: function disabledSeconds() {
+  disabledSeconds() {
     return [];
-  }
+  },
 };
 
 export function getTodayTime(value) {
-  var today = moment();
+  const today = moment();
   today.locale(value.locale()).utcOffset(value.utcOffset());
   return today;
 }
@@ -24,13 +23,13 @@ export function getTitleString(value) {
 }
 
 export function getTodayTimeStr(value) {
-  var today = getTodayTime(value);
+  const today = getTodayTime(value);
   return getTitleString(today);
 }
 
 export function getMonthName(month) {
-  var locale = month.locale();
-  var localeData = month.localeData();
+  const locale = month.locale();
+  const localeData = month.localeData();
   return localeData[locale === 'zh-cn' ? 'months' : 'monthsShort'](month);
 }
 
@@ -39,25 +38,29 @@ export function syncTime(from, to) {
   to.hour(from.hour());
   to.minute(from.minute());
   to.second(from.second());
+  to.millisecond(from.millisecond());
 }
 
 export function getTimeConfig(value, disabledTime) {
-  var disabledTimeConfig = disabledTime ? disabledTime(value) : {};
-  disabledTimeConfig = _extends({}, defaultDisabledTime, disabledTimeConfig);
+  let disabledTimeConfig = disabledTime ? disabledTime(value) : {};
+  disabledTimeConfig = {
+    ...defaultDisabledTime,
+    ...disabledTimeConfig,
+  };
   return disabledTimeConfig;
 }
 
 export function isTimeValidByConfig(value, disabledTimeConfig) {
-  var invalidTime = false;
+  let invalidTime = false;
   if (value) {
-    var hour = value.hour();
-    var minutes = value.minute();
-    var seconds = value.second();
-    var disabledHours = disabledTimeConfig.disabledHours();
+    const hour = value.hour();
+    const minutes = value.minute();
+    const seconds = value.second();
+    const disabledHours = disabledTimeConfig.disabledHours();
     if (disabledHours.indexOf(hour) === -1) {
-      var disabledMinutes = disabledTimeConfig.disabledMinutes(hour);
+      const disabledMinutes = disabledTimeConfig.disabledMinutes(hour);
       if (disabledMinutes.indexOf(minutes) === -1) {
-        var disabledSeconds = disabledTimeConfig.disabledSeconds(hour, minutes);
+        const disabledSeconds = disabledTimeConfig.disabledSeconds(hour, minutes);
         invalidTime = disabledSeconds.indexOf(seconds) !== -1;
       } else {
         invalidTime = true;
@@ -70,7 +73,7 @@ export function isTimeValidByConfig(value, disabledTimeConfig) {
 }
 
 export function isTimeValid(value, disabledTime) {
-  var disabledTimeConfig = getTimeConfig(value, disabledTime);
+  const disabledTimeConfig = getTimeConfig(value, disabledTime);
   return isTimeValidByConfig(value, disabledTimeConfig);
 }
 
@@ -95,6 +98,15 @@ export function formatDate(value, format) {
 
   if (Array.isArray(format)) {
     format = format[0];
+  }
+
+  if (typeof format === 'function') {
+    const result = format(value);
+    if (typeof result === 'string') {
+      return result;
+    } else {
+      throw new Error('The function of format does not return a string');
+    }
   }
 
   return value.format(format);

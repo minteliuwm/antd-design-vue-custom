@@ -22,5 +22,5 @@ export default {
   previousDecade: 'ئالدىنقى يىللار',
   nextDecade: 'كېيىنكى يىللار',
   previousCentury: 'ئالدىنقى ئەسىر',
-  nextCentury: 'كېيىنكى ئەسىر'
+  nextCentury: 'كېيىنكى ئەسىر',
 };

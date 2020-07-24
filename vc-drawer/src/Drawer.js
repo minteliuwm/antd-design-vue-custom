@@ -1,27 +1,36 @@
-import _mergeJSXProps from 'babel-helper-vue-jsx-merge-props';
-import _defineProperty from 'babel-runtime/helpers/defineProperty';
-import _typeof from 'babel-runtime/helpers/typeof';
-import _extends from 'babel-runtime/helpers/extends';
 import classnames from 'classnames';
 import Vue from 'vue';
 import ref from 'vue-ref';
 import BaseMixin from '../../_util/BaseMixin';
-import { initDefaultProps, getEvents } from '../../_util/props-util';
+import { initDefaultProps, getEvents, getListeners } from '../../_util/props-util';
 import { cloneElement } from '../../_util/vnode';
-import ContainerRender from '../../_util/ContainerRender';
 import getScrollBarSize from '../../_util/getScrollBarSize';
-import drawerProps from './drawerProps';
-import { dataToArray, transitionEnd, transitionStr, addEventListener, removeEventListener, transformArguments, isNumeric } from './utils';
+import { IDrawerProps } from './IDrawerPropTypes';
+import KeyCode from '../../_util/KeyCode';
+import {
+  dataToArray,
+  transitionEnd,
+  transitionStr,
+  addEventListener,
+  removeEventListener,
+  transformArguments,
+  isNumeric,
+} from './utils';
+import Portal from '../../_util/Portal';
 
 function noop() {}
 
-var currentDrawer = {};
-var windowIsUndefined = !(typeof window !== 'undefined' && window.document && window.document.createElement);
+const currentDrawer = {};
+const windowIsUndefined = !(
+  typeof window !== 'undefined' &&
+  window.document &&
+  window.document.createElement
+);
 
 Vue.use(ref, { name: 'ant-ref' });
-var Drawer = {
+const Drawer = {
   mixins: [BaseMixin],
-  props: initDefaultProps(drawerProps, {
+  props: initDefaultProps(IDrawerProps, {
     prefixCls: 'drawer',
     placement: 'left',
     getContainer: 'body',
@@ -33,9 +42,9 @@ var Drawer = {
     handler: true,
     maskStyle: {},
     wrapperClassName: '',
-    className: ''
+    className: '',
   }),
-  data: function data() {
+  data() {
     this.levelDom = [];
     this.contentDom = null;
     this.maskDom = null;
@@ -44,52 +53,45 @@ var Drawer = {
     this.sFirstEnter = this.firstEnter;
     this.timeout = null;
     this.children = null;
-    this.drawerId = Number((Date.now() + Math.random()).toString().replace('.', Math.round(Math.random() * 9))).toString(16);
-    var open = this.open !== undefined ? this.open : !!this.defaultOpen;
+    this.drawerId = Number(
+      (Date.now() + Math.random()).toString().replace('.', Math.round(Math.random() * 9)),
+    ).toString(16);
+    const open = this.open !== undefined ? this.open : !!this.defaultOpen;
     currentDrawer[this.drawerId] = open;
     this.orignalOpen = this.open;
-    this.preProps = _extends({}, this.$props);
+    this.preProps = { ...this.$props };
     return {
-      sOpen: open
+      sOpen: open,
     };
   },
-  mounted: function mounted() {
-    var _this = this;
-
-    this.$nextTick(function () {
+  mounted() {
+    this.$nextTick(() => {
       if (!windowIsUndefined) {
-        var passiveSupported = false;
-        window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
-          get: function get() {
-            passiveSupported = true;
-            return null;
-          }
-        }));
-        _this.passive = passiveSupported ? { passive: false } : false;
+        let passiveSupported = false;
+        window.addEventListener(
+          'test',
+          null,
+          Object.defineProperty({}, 'passive', {
+            get: () => {
+              passiveSupported = true;
+              return null;
+            },
+          }),
+        );
+        this.passive = passiveSupported ? { passive: false } : false;
       }
-      var open = _this.getOpen();
-      if (_this.handler || open || _this.sFirstEnter) {
-        _this.getDefault(_this.$props);
+      const open = this.getOpen();
+      if (this.handler || open || this.sFirstEnter) {
+        this.getDefault(this.$props);
         if (open) {
-          _this.isOpenChange = true;
+          this.isOpenChange = true;
         }
-        _this.$forceUpdate();
+        this.$forceUpdate();
       }
     });
   },
-
   watch: {
-    open: function (_open) {
-      function open(_x) {
-        return _open.apply(this, arguments);
-      }
-
-      open.toString = function () {
-        return _open.toString();
-      };
-
-      return open;
-    }(function (val) {
+    open(val) {
       if (val !== undefined && val !== this.preProps.open) {
         this.isOpenChange = true;
         // 没渲染 dom 时，获取默认数据;
@@ -97,37 +99,35 @@ var Drawer = {
           this.getDefault(this.$props);
         }
         this.setState({
-          sOpen: open
+          sOpen: open,
         });
       }
       this.preProps.open = val;
-    }),
-    placement: function placement(val) {
+    },
+    placement(val) {
       if (val !== this.preProps.placement) {
         // test 的 bug, 有动画过场，删除 dom
         this.contentDom = null;
       }
       this.preProps.placement = val;
     },
-    level: function level(val) {
+    level(val) {
       if (this.preProps.level !== val) {
         this.getParentAndLevelDom(this.$props);
       }
       this.preProps.level = val;
-    }
+    },
   },
-  updated: function updated() {
-    var _this2 = this;
-
-    this.$nextTick(function () {
+  updated() {
+    this.$nextTick(() => {
       // dom 没渲染时，重走一遍。
-      if (!_this2.sFirstEnter && _this2.container) {
-        _this2.$forceUpdate();
-        _this2.sFirstEnter = true;
+      if (!this.sFirstEnter && this.container) {
+        this.$forceUpdate();
+        this.sFirstEnter = true;
       }
     });
   },
-  beforeDestroy: function beforeDestroy() {
+  beforeDestroy() {
     delete currentDrawer[this.drawerId];
     delete this.isOpenChange;
     if (this.container) {
@@ -135,88 +135,78 @@ var Drawer = {
         this.setLevelDomTransform(false, true);
       }
       document.body.style.overflow = '';
-      // 拦不住。。直接删除；
-      if (this.getSelfContainer) {
-        this.container.parentNode.removeChild(this.container);
-      }
     }
     this.sFirstEnter = false;
     clearTimeout(this.timeout);
-    // 需要 didmount 后也会渲染，直接 unmount 将不会渲染，加上判断.
-    if (this.renderComponent) {
-      this.renderComponent({
-        afterClose: this.removeContainer,
-        onClose: function onClose() {},
-
-        visible: false
-      });
-    }
   },
-
   methods: {
-    onMaskTouchEnd: function onMaskTouchEnd(e) {
-      this.$emit('maskClick', e);
+    onKeyDown(e) {
+      if (e.keyCode === KeyCode.ESC) {
+        e.stopPropagation();
+        this.$emit('close', e);
+      }
+    },
+    onMaskTouchEnd(e) {
+      this.$emit('close', e);
       this.onTouchEnd(e, true);
     },
-    onIconTouchEnd: function onIconTouchEnd(e) {
+    onIconTouchEnd(e) {
       this.$emit('handleClick', e);
       this.onTouchEnd(e);
     },
-    onTouchEnd: function onTouchEnd(e, close) {
+    onTouchEnd(e, close) {
       if (this.open !== undefined) {
         return;
       }
-      var open = close || this.sOpen;
+      const open = close || this.sOpen;
       this.isOpenChange = true;
       this.setState({
-        sOpen: !open
+        sOpen: !open,
       });
     },
-    onWrapperTransitionEnd: function onWrapperTransitionEnd(e) {
-      if (e.target === this.contentWrapper) {
+    onWrapperTransitionEnd(e) {
+      if (e.target === this.contentWrapper && e.propertyName.match(/transform$/)) {
+        const open = this.getOpen();
         this.dom.style.transition = '';
-        if (!this.sOpen && this.getCurrentDrawerSome()) {
+        if (!open && this.getCurrentDrawerSome()) {
           document.body.style.overflowX = '';
           if (this.maskDom) {
             this.maskDom.style.left = '';
             this.maskDom.style.width = '';
           }
         }
+        if (this.afterVisibleChange) {
+          this.afterVisibleChange(!!open);
+        }
       }
     },
-    getDefault: function getDefault(props) {
+    getDefault(props) {
       this.getParentAndLevelDom(props);
       if (props.getContainer || props.parent) {
         this.container = this.defaultGetContainer();
       }
     },
-    getCurrentDrawerSome: function getCurrentDrawerSome() {
-      return !Object.keys(currentDrawer).some(function (key) {
-        return currentDrawer[key];
-      });
+    getCurrentDrawerSome() {
+      return !Object.keys(currentDrawer).some(key => currentDrawer[key]);
     },
-    getSelfContainer: function getSelfContainer() {
+    getSelfContainer() {
       return this.container;
     },
-    getParentAndLevelDom: function getParentAndLevelDom(props) {
-      var _this3 = this;
-
+    getParentAndLevelDom(props) {
       if (windowIsUndefined) {
         return;
       }
-      var level = props.level,
-          getContainer = props.getContainer;
-
+      const { level, getContainer } = props;
       this.levelDom = [];
       if (getContainer) {
         if (typeof getContainer === 'string') {
-          var dom = document.querySelectorAll(getContainer)[0];
+          const dom = document.querySelectorAll(getContainer)[0];
           this.parent = dom;
         }
         if (typeof getContainer === 'function') {
           this.parent = getContainer();
         }
-        if ((typeof getContainer === 'undefined' ? 'undefined' : _typeof(getContainer)) === 'object' && getContainer instanceof window.HTMLElement) {
+        if (typeof getContainer === 'object' && getContainer instanceof window.HTMLElement) {
           this.parent = getContainer;
         }
       }
@@ -224,87 +214,95 @@ var Drawer = {
         this.parent = this.container.parentNode;
       }
       if (level === 'all') {
-        var children = Array.prototype.slice.call(this.parent.children);
-        children.forEach(function (child) {
-          if (child.nodeName !== 'SCRIPT' && child.nodeName !== 'STYLE' && child.nodeName !== 'LINK' && child !== _this3.container) {
-            _this3.levelDom.push(child);
+        const children = Array.prototype.slice.call(this.parent.children);
+        children.forEach(child => {
+          if (
+            child.nodeName !== 'SCRIPT' &&
+            child.nodeName !== 'STYLE' &&
+            child.nodeName !== 'LINK' &&
+            child !== this.container
+          ) {
+            this.levelDom.push(child);
           }
         });
       } else if (level) {
-        dataToArray(level).forEach(function (key) {
-          document.querySelectorAll(key).forEach(function (item) {
-            _this3.levelDom.push(item);
+        dataToArray(level).forEach(key => {
+          document.querySelectorAll(key).forEach(item => {
+            this.levelDom.push(item);
           });
         });
       }
     },
-    setLevelDomTransform: function setLevelDomTransform(open, openTransition, placementName, value) {
-      var _this4 = this;
-
-      var _$props = this.$props,
-          placement = _$props.placement,
-          levelMove = _$props.levelMove,
-          duration = _$props.duration,
-          ease = _$props.ease,
-          getContainer = _$props.getContainer;
-
+    setLevelDomTransform(open, openTransition, placementName, value) {
+      const { placement, levelMove, duration, ease, getContainer } = this.$props;
       if (!windowIsUndefined) {
-        this.levelDom.forEach(function (dom) {
-          if (_this4.isOpenChange || openTransition) {
+        this.levelDom.forEach(dom => {
+          if (this.isOpenChange || openTransition) {
             /* eslint no-param-reassign: "error" */
-            dom.style.transition = 'transform ' + duration + ' ' + ease;
-            addEventListener(dom, transitionEnd, _this4.trnasitionEnd);
-            var levelValue = open ? value : 0;
+            dom.style.transition = `transform ${duration} ${ease}`;
+            addEventListener(dom, transitionEnd, this.trnasitionEnd);
+            let levelValue = open ? value : 0;
             if (levelMove) {
-              var $levelMove = transformArguments(levelMove, { target: dom, open: open });
+              const $levelMove = transformArguments(levelMove, { target: dom, open });
               levelValue = open ? $levelMove[0] : $levelMove[1] || 0;
             }
-            var $value = typeof levelValue === 'number' ? levelValue + 'px' : levelValue;
-            var placementPos = placement === 'left' || placement === 'top' ? $value : '-' + $value;
-            dom.style.transform = levelValue ? placementName + '(' + placementPos + ')' : '';
-            dom.style.msTransform = levelValue ? placementName + '(' + placementPos + ')' : '';
+            const $value = typeof levelValue === 'number' ? `${levelValue}px` : levelValue;
+            const placementPos =
+              placement === 'left' || placement === 'top' ? $value : `-${$value}`;
+            dom.style.transform = levelValue ? `${placementName}(${placementPos})` : '';
+            dom.style.msTransform = levelValue ? `${placementName}(${placementPos})` : '';
           }
         });
         // 处理 body 滚动
         if (getContainer === 'body') {
-          var eventArray = ['touchstart'];
-          var domArray = [document.body, this.maskDom, this.handlerdom, this.contentDom];
-          var right = document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight) && window.innerWidth > document.body.offsetWidth ? getScrollBarSize(1) : 0;
-          var widthTransition = 'width ' + duration + ' ' + ease;
-          var trannsformTransition = 'transform ' + duration + ' ' + ease;
+          const eventArray = ['touchstart'];
+          const domArray = [document.body, this.maskDom, this.handlerdom, this.contentDom];
+          const right =
+            document.body.scrollHeight >
+              (window.innerHeight || document.documentElement.clientHeight) &&
+            window.innerWidth > document.body.offsetWidth
+              ? getScrollBarSize(1)
+              : 0;
+          let widthTransition = `width ${duration} ${ease}`;
+          const trannsformTransition = `transform ${duration} ${ease}`;
           if (open && document.body.style.overflow !== 'hidden') {
             document.body.style.overflow = 'hidden';
             if (right) {
               document.body.style.position = 'relative';
-              document.body.style.width = 'calc(100% - ' + right + 'px)';
+              document.body.style.width = `calc(100% - ${right}px)`;
               this.dom.style.transition = 'none';
               switch (placement) {
                 case 'right':
-                  this.dom.style.transform = 'translateX(-' + right + 'px)';
-                  this.dom.style.msTransform = 'translateX(-' + right + 'px)';
+                  this.dom.style.transform = `translateX(-${right}px)`;
+                  this.dom.style.msTransform = `translateX(-${right}px)`;
                   break;
                 case 'top':
                 case 'bottom':
-                  this.dom.style.width = 'calc(100% - ' + right + 'px)';
+                  this.dom.style.width = `calc(100% - ${right}px)`;
                   this.dom.style.transform = 'translateZ(0)';
                   break;
                 default:
                   break;
               }
               clearTimeout(this.timeout);
-              this.timeout = setTimeout(function () {
-                _this4.dom.style.transition = trannsformTransition + ',' + widthTransition;
-                _this4.dom.style.width = '';
-                _this4.dom.style.transform = '';
-                _this4.dom.style.msTransform = '';
+              this.timeout = setTimeout(() => {
+                this.dom.style.transition = `${trannsformTransition},${widthTransition}`;
+                this.dom.style.width = '';
+                this.dom.style.transform = '';
+                this.dom.style.msTransform = '';
               });
             }
             // 手机禁滚
-            domArray.forEach(function (item, i) {
+            domArray.forEach((item, i) => {
               if (!item) {
                 return;
               }
-              addEventListener(item, eventArray[i] || 'touchmove', i ? _this4.removeMoveHandler : _this4.removeStartHandler, _this4.passive);
+              addEventListener(
+                item,
+                eventArray[i] || 'touchmove',
+                i ? this.removeMoveHandler : this.removeStartHandler,
+                this.passive,
+              );
             });
           } else if (this.getCurrentDrawerSome()) {
             document.body.style.overflow = '';
@@ -315,188 +313,201 @@ var Drawer = {
                 document.body.style.overflowX = 'hidden';
               }
               this.dom.style.transition = 'none';
-              var heightTransition = void 0;
+              let heightTransition;
               switch (placement) {
-                case 'right':
-                  {
-                    this.dom.style.transform = 'translateX(' + right + 'px)';
-                    this.dom.style.msTransform = 'translateX(' + right + 'px)';
-                    this.dom.style.width = '100%';
-                    widthTransition = 'width 0s ' + ease + ' ' + duration;
-                    if (this.maskDom) {
-                      this.maskDom.style.left = '-' + right + 'px';
-                      this.maskDom.style.width = 'calc(100% + ' + right + 'px)';
-                    }
-                    break;
+                case 'right': {
+                  this.dom.style.transform = `translateX(${right}px)`;
+                  this.dom.style.msTransform = `translateX(${right}px)`;
+                  this.dom.style.width = '100%';
+                  widthTransition = `width 0s ${ease} ${duration}`;
+                  if (this.maskDom) {
+                    this.maskDom.style.left = `-${right}px`;
+                    this.maskDom.style.width = `calc(100% + ${right}px)`;
                   }
+                  break;
+                }
                 case 'top':
-                case 'bottom':
-                  {
-                    this.dom.style.width = 'calc(100% + ' + right + 'px)';
-                    this.dom.style.height = '100%';
-                    this.dom.style.transform = 'translateZ(0)';
-                    heightTransition = 'height 0s ' + ease + ' ' + duration;
-                    break;
-                  }
+                case 'bottom': {
+                  this.dom.style.width = `calc(100% + ${right}px)`;
+                  this.dom.style.height = '100%';
+                  this.dom.style.transform = 'translateZ(0)';
+                  heightTransition = `height 0s ${ease} ${duration}`;
+                  break;
+                }
                 default:
                   break;
               }
               clearTimeout(this.timeout);
-              this.timeout = setTimeout(function () {
-                _this4.dom.style.transition = trannsformTransition + ',' + (heightTransition ? heightTransition + ',' : '') + widthTransition;
-                _this4.dom.style.transform = '';
-                _this4.dom.style.msTransform = '';
-                _this4.dom.style.width = '';
-                _this4.dom.style.height = '';
+              this.timeout = setTimeout(() => {
+                this.dom.style.transition = `${trannsformTransition},${
+                  heightTransition ? `${heightTransition},` : ''
+                }${widthTransition}`;
+                this.dom.style.transform = '';
+                this.dom.style.msTransform = '';
+                this.dom.style.width = '';
+                this.dom.style.height = '';
               });
             }
-            domArray.forEach(function (item, i) {
+            domArray.forEach((item, i) => {
               if (!item) {
                 return;
               }
-              removeEventListener(item, eventArray[i] || 'touchmove', i ? _this4.removeMoveHandler : _this4.removeStartHandler, _this4.passive);
+              removeEventListener(
+                item,
+                eventArray[i] || 'touchmove',
+                i ? this.removeMoveHandler : this.removeStartHandler,
+                this.passive,
+              );
             });
           }
         }
       }
-      var change = this.$listeners.change;
-
+      const { change } = getListeners(this);
       if (change && this.isOpenChange && this.sFirstEnter) {
         change(open);
         this.isOpenChange = false;
       }
     },
-    getChildToRender: function getChildToRender(open) {
-      var _classnames,
-          _this5 = this;
-
-      var h = this.$createElement;
-      var _$props2 = this.$props,
-          className = _$props2.className,
-          prefixCls = _$props2.prefixCls,
-          placement = _$props2.placement,
-          handler = _$props2.handler,
-          showMask = _$props2.showMask,
-          maskStyle = _$props2.maskStyle,
-          width = _$props2.width,
-          height = _$props2.height,
-          wrapStyle = _$props2.wrapStyle;
-
-      var children = this.$slots['default'];
-      var wrapperClassname = classnames(prefixCls, (_classnames = {}, _defineProperty(_classnames, prefixCls + '-' + placement, true), _defineProperty(_classnames, prefixCls + '-open', open), _defineProperty(_classnames, className, !!className), _classnames));
-      var isOpenChange = this.isOpenChange;
-      var isHorizontal = placement === 'left' || placement === 'right';
-      var placementName = 'translate' + (isHorizontal ? 'X' : 'Y');
+    getChildToRender(open) {
+      const {
+        className,
+        prefixCls,
+        placement,
+        handler,
+        showMask,
+        maskStyle,
+        width,
+        height,
+        wrapStyle,
+        keyboard,
+        maskClosable,
+      } = this.$props;
+      const children = this.$slots.default;
+      const wrapperClassname = classnames(prefixCls, {
+        [`${prefixCls}-${placement}`]: true,
+        [`${prefixCls}-open`]: open,
+        [className]: !!className,
+        'no-mask': !showMask,
+      });
+      const isOpenChange = this.isOpenChange;
+      const isHorizontal = placement === 'left' || placement === 'right';
+      const placementName = `translate${isHorizontal ? 'X' : 'Y'}`;
       // 百分比与像素动画不同步，第一次打用后全用像素动画。
       // const defaultValue = !this.contentDom || !level ? '100%' : `${value}px`;
-      var placementPos = placement === 'left' || placement === 'top' ? '-100%' : '100%';
-      var transform = open ? '' : placementName + '(' + placementPos + ')';
+      const placementPos = placement === 'left' || placement === 'top' ? '-100%' : '100%';
+      const transform = open ? '' : `${placementName}(${placementPos})`;
       if (isOpenChange === undefined || isOpenChange) {
-        var contentValue = this.contentDom ? this.contentDom.getBoundingClientRect()[isHorizontal ? 'width' : 'height'] : 0;
-        var value = (isHorizontal ? width : height) || contentValue;
+        const contentValue = this.contentDom
+          ? this.contentDom.getBoundingClientRect()[isHorizontal ? 'width' : 'height']
+          : 0;
+        const value = (isHorizontal ? width : height) || contentValue;
         this.setLevelDomTransform(open, false, placementName, value);
       }
-      var handlerChildren = void 0;
+      let handlerChildren;
       if (handler !== false) {
-        var handlerDefalut = h(
-          'div',
-          { 'class': 'drawer-handle' },
-          [h('i', { 'class': 'drawer-handle-icon' })]
+        const handlerDefalut = (
+          <div class="drawer-handle">
+            <i class="drawer-handle-icon" />
+          </div>
         );
-        var handlerSlot = this.handler;
-
-        var handlerSlotVnode = handlerSlot && handlerSlot[0] || handlerDefalut;
-
-        var _getEvents = getEvents(handlerSlotVnode),
-            handleIconClick = _getEvents.click;
-
+        const { handler: handlerSlot } = this;
+        const handlerSlotVnode = (handlerSlot && handlerSlot[0]) || handlerDefalut;
+        const { click: handleIconClick } = getEvents(handlerSlotVnode);
         handlerChildren = cloneElement(handlerSlotVnode, {
           on: {
-            click: function click(e) {
+            click: e => {
               handleIconClick && handleIconClick();
-              _this5.onIconTouchEnd(e);
-            }
+              this.onIconTouchEnd(e);
+            },
           },
-          directives: [{
-            name: 'ant-ref',
-            value: function value(c) {
-              _this5.handlerdom = c;
-            }
-          }]
+          directives: [
+            {
+              name: 'ant-ref',
+              value: c => {
+                this.handlerdom = c;
+              },
+            },
+          ],
         });
       }
-
-      var domContProps = {
-        'class': wrapperClassname,
-        directives: [{
-          name: 'ant-ref',
-          value: function value(c) {
-            _this5.dom = c;
-          }
-        }],
-        on: {
-          transitionend: this.onWrapperTransitionEnd
-        },
-        style: wrapStyle
-      };
-      var directivesMaskDom = [{
-        name: 'ant-ref',
-        value: function value(c) {
-          _this5.maskDom = c;
-        }
-      }];
-      var directivesContentWrapper = [{
-        name: 'ant-ref',
-        value: function value(c) {
-          _this5.contentWrapper = c;
-        }
-      }];
-      var directivesContentDom = [{
-        name: 'ant-ref',
-        value: function value(c) {
-          _this5.contentDom = c;
-        }
-      }];
-      return h(
-        'div',
-        domContProps,
-        [showMask && h('div', _mergeJSXProps([{
-          'class': prefixCls + '-mask',
-          on: {
-            'click': this.onMaskTouchEnd
+      const domContProps = {
+        class: wrapperClassname,
+        directives: [
+          {
+            name: 'ant-ref',
+            value: c => {
+              this.dom = c;
+            },
           },
-
-          style: maskStyle
-        }, { directives: directivesMaskDom }])), h(
-          'div',
-          _mergeJSXProps([{
-            'class': prefixCls + '-content-wrapper',
-            style: {
-              transform: transform,
+        ],
+        on: {
+          transitionend: this.onWrapperTransitionEnd,
+          keydown: open && keyboard ? this.onKeyDown : noop,
+        },
+        style: wrapStyle,
+      };
+      const directivesMaskDom = [
+        {
+          name: 'ant-ref',
+          value: c => {
+            this.maskDom = c;
+          },
+        },
+      ];
+      const directivesContentWrapper = [
+        {
+          name: 'ant-ref',
+          value: c => {
+            this.contentWrapper = c;
+          },
+        },
+      ];
+      const directivesContentDom = [
+        {
+          name: 'ant-ref',
+          value: c => {
+            this.contentDom = c;
+          },
+        },
+      ];
+      return (
+        <div {...domContProps} tabIndex={-1}>
+          {showMask && (
+            <div
+              key={open} // 第二次渲染时虚拟DOM没有改变，没有出发dom更新，使用key强制更新 https://github.com/vueComponent/ant-design-vue/issues/2407
+              class={`${prefixCls}-mask`}
+              onClick={maskClosable ? this.onMaskTouchEnd : noop}
+              style={maskStyle}
+              {...{ directives: directivesMaskDom }}
+            />
+          )}
+          <div
+            class={`${prefixCls}-content-wrapper`}
+            style={{
+              transform,
               msTransform: transform,
-              width: isNumeric(width) ? width + 'px' : width,
-              height: isNumeric(height) ? height + 'px' : height
-            }
-          }, { directives: directivesContentWrapper }]),
-          [h(
-            'div',
-            _mergeJSXProps([{
-              'class': prefixCls + '-content'
-            }, { directives: directivesContentDom }, {
-              on: {
-                'touchstart': open ? this.removeStartHandler : noop,
-                'touchmove': open ? this.removeMoveHandler : noop
-              }
-            }]),
-            [children]
-          ), handlerChildren]
-        )]
+              width: isNumeric(width) ? `${width}px` : width,
+              height: isNumeric(height) ? `${height}px` : height,
+            }}
+            {...{ directives: directivesContentWrapper }}
+          >
+            <div
+              class={`${prefixCls}-content`}
+              {...{ directives: directivesContentDom }}
+              onTouchstart={open ? this.removeStartHandler : noop} // 跑用例用
+              onTouchmove={open ? this.removeMoveHandler : noop} // 跑用例用
+            >
+              {children}
+            </div>
+            {handlerChildren}
+          </div>
+        </div>
       );
     },
-    getOpen: function getOpen() {
+    getOpen() {
       return this.open !== undefined ? this.open : this.sOpen;
     },
-    getTouchParentScroll: function getTouchParentScroll(root, currentTarget, differX, differY) {
+    getTouchParentScroll(root, currentTarget, differX, differY) {
       if (!currentTarget || currentTarget === document) {
         return false;
       }
@@ -505,11 +516,11 @@ var Drawer = {
         return true;
       }
 
-      var isY = Math.max(Math.abs(differX), Math.abs(differY)) === Math.abs(differY);
-      var isX = Math.max(Math.abs(differX), Math.abs(differY)) === Math.abs(differX);
+      const isY = Math.max(Math.abs(differX), Math.abs(differY)) === Math.abs(differY);
+      const isX = Math.max(Math.abs(differX), Math.abs(differY)) === Math.abs(differX);
 
-      var scrollY = currentTarget.scrollHeight - currentTarget.clientHeight;
-      var scrollX = currentTarget.scrollWidth - currentTarget.clientWidth;
+      const scrollY = currentTarget.scrollHeight - currentTarget.clientHeight;
+      const scrollX = currentTarget.scrollWidth - currentTarget.clientWidth;
       /**
        * <div style="height: 300px">
        *   <div style="height: 900px"></div>
@@ -517,106 +528,107 @@ var Drawer = {
        * 在没设定 overflow: auto 或 scroll 时，currentTarget 里获取不到 scrollTop 或 scrollLeft,
        * 预先用 scrollTo 来滚动，如果取出的值跟滚动前取出不同，则 currnetTarget 被设定了 overflow; 否则就是上面这种。
        */
-      var t = currentTarget.scrollTop;
-      var l = currentTarget.scrollLeft;
+      const t = currentTarget.scrollTop;
+      const l = currentTarget.scrollLeft;
       if (currentTarget.scrollTo) {
         currentTarget.scrollTo(currentTarget.scrollLeft + 1, currentTarget.scrollTop + 1);
       }
-      var currentT = currentTarget.scrollTop;
-      var currentL = currentTarget.scrollLeft;
+      const currentT = currentTarget.scrollTop;
+      const currentL = currentTarget.scrollLeft;
       if (currentTarget.scrollTo) {
         currentTarget.scrollTo(currentTarget.scrollLeft - 1, currentTarget.scrollTop - 1);
       }
-      if (isY && (!scrollY || !(currentT - t) || scrollY && (currentTarget.scrollTop >= scrollY && differY < 0 || currentTarget.scrollTop <= 0 && differY > 0)) || isX && (!scrollX || !(currentL - l) || scrollX && (currentTarget.scrollLeft >= scrollX && differX < 0 || currentTarget.scrollLeft <= 0 && differX > 0))) {
+      if (
+        (isY &&
+          (!scrollY ||
+            !(currentT - t) ||
+            (scrollY &&
+              ((currentTarget.scrollTop >= scrollY && differY < 0) ||
+                (currentTarget.scrollTop <= 0 && differY > 0))))) ||
+        (isX &&
+          (!scrollX ||
+            !(currentL - l) ||
+            (scrollX &&
+              ((currentTarget.scrollLeft >= scrollX && differX < 0) ||
+                (currentTarget.scrollLeft <= 0 && differX > 0)))))
+      ) {
         return this.getTouchParentScroll(root, currentTarget.parentNode, differX, differY);
       }
       return false;
     },
-    removeStartHandler: function removeStartHandler(e) {
+    removeStartHandler(e) {
       if (e.touches.length > 1) {
         return;
       }
       this.startPos = {
         x: e.touches[0].clientX,
-        y: e.touches[0].clientY
+        y: e.touches[0].clientY,
       };
     },
-    removeMoveHandler: function removeMoveHandler(e) {
+    removeMoveHandler(e) {
       if (e.changedTouches.length > 1) {
         return;
       }
-      var currentTarget = e.currentTarget;
-      var differX = e.changedTouches[0].clientX - this.startPos.x;
-      var differY = e.changedTouches[0].clientY - this.startPos.y;
-      if (currentTarget === this.maskDom || currentTarget === this.handlerdom || currentTarget === this.contentDom && this.getTouchParentScroll(currentTarget, e.target, differX, differY)) {
+      const currentTarget = e.currentTarget;
+      const differX = e.changedTouches[0].clientX - this.startPos.x;
+      const differY = e.changedTouches[0].clientY - this.startPos.y;
+      if (
+        currentTarget === this.maskDom ||
+        currentTarget === this.handlerdom ||
+        (currentTarget === this.contentDom &&
+          this.getTouchParentScroll(currentTarget, e.target, differX, differY))
+      ) {
         e.preventDefault();
       }
     },
-    trnasitionEnd: function trnasitionEnd(e) {
+    trnasitionEnd(e) {
       removeEventListener(e.target, transitionEnd, this.trnasitionEnd);
       e.target.style.transition = '';
     },
-    defaultGetContainer: function defaultGetContainer() {
+    defaultGetContainer() {
       if (windowIsUndefined) {
         return null;
       }
-      var container = document.createElement('div');
+      const container = document.createElement('div');
       this.parent.appendChild(container);
       if (this.wrapperClassName) {
         container.className = this.wrapperClassName;
       }
       return container;
-    }
+    },
   },
 
-  render: function render() {
-    var _this6 = this;
-
-    var h = arguments[0];
-    var _$props3 = this.$props,
-        getContainer = _$props3.getContainer,
-        wrapperClassName = _$props3.wrapperClassName;
-
-    var open = this.getOpen();
+  render() {
+    const { getContainer, wrapperClassName, handler, forceRender } = this.$props;
+    const open = this.getOpen();
+    let portal = null;
     currentDrawer[this.drawerId] = open ? this.container : open;
-    var children = this.getChildToRender(this.sFirstEnter ? open : false);
+    const children = this.getChildToRender(this.sFirstEnter ? open : false);
     if (!getContainer) {
-      var directives = [{
-        name: 'ant-ref',
-        value: function value(c) {
-          _this6.container = c;
-        }
-      }];
-      return h(
-        'div',
-        _mergeJSXProps([{ 'class': wrapperClassName }, { directives: directives }]),
-        [children]
+      const directives = [
+        {
+          name: 'ant-ref',
+          value: c => {
+            this.container = c;
+          },
+        },
+      ];
+      return (
+        <div class={wrapperClassName} {...{ directives }}>
+          {children}
+        </div>
       );
     }
-    if (!this.container || !open && !this.sFirstEnter) {
+    if (!this.container || (!open && !this.sFirstEnter)) {
       return null;
     }
-    return h(ContainerRender, {
-      attrs: {
-        parent: this,
-        visible: true,
-        autoMount: true,
-        autoDestroy: false,
-        getComponent: function getComponent() {
-          return children;
-        },
-        getContainer: this.getSelfContainer,
-        children: function children(_ref) {
-          var renderComponent = _ref.renderComponent,
-              removeContainer = _ref.removeContainer;
-
-          _this6.renderComponent = renderComponent;
-          _this6.removeContainer = removeContainer;
-          return null;
-        }
-      }
-    });
-  }
+    // 如果有 handler 为内置强制渲染；
+    const $forceRender = !!handler || forceRender;
+    if ($forceRender || open || this.dom) {
+      portal = <Portal getContainer={this.getSelfContainer} children={children}></Portal>;
+    }
+    return portal;
+  },
 };
 
 export default Drawer;

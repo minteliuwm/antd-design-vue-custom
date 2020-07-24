@@ -1,5 +1,10 @@
-import _typeof from 'babel-runtime/helpers/typeof';
-import { getPropsData, getSlotOptions, getKey, getAttrs, getComponentFromProp } from '../_util/props-util';
+import {
+  getPropsData,
+  getSlotOptions,
+  getKey,
+  getAttrs,
+  getComponentFromProp,
+} from '../_util/props-util';
 import { cloneVNodes } from '../_util/vnode';
 
 export function toTitle(title) {
@@ -12,7 +17,7 @@ export function getValuePropValue(child) {
   if (!child) {
     return null;
   }
-  var props = getPropsData(child);
+  const props = getPropsData(child);
   if ('value' in props) {
     return props.value;
   }
@@ -20,12 +25,12 @@ export function getValuePropValue(child) {
     return getKey(child);
   }
   if (getSlotOptions(child).isSelectOptGroup) {
-    var label = getComponentFromProp(child, 'label');
+    const label = getComponentFromProp(child, 'label');
     if (label) {
       return label;
     }
   }
-  throw new Error('Need at least a key or a value or a label (only for OptGroup) for ' + child);
+  throw new Error(`Need at least a key or a value or a label (only for OptGroup) for ${child}`);
 }
 
 export function getPropValue(child, prop) {
@@ -33,13 +38,15 @@ export function getPropValue(child, prop) {
     return getValuePropValue(child);
   }
   if (prop === 'children') {
-    var newChild = child.$slots ? cloneVNodes(child.$slots['default'], true) : cloneVNodes(child.componentOptions.children, true);
+    const newChild = child.$slots
+      ? cloneVNodes(child.$slots.default, true)
+      : cloneVNodes(child.componentOptions.children, true);
     if (newChild.length === 1 && !newChild[0].tag) {
       return newChild[0].text;
     }
     return newChild;
   }
-  var data = getPropsData(child);
+  const data = getPropsData(child);
   if (prop in data) {
     return data[prop];
   } else {
@@ -68,7 +75,7 @@ export function isSingleMode(props) {
 }
 
 export function toArray(value) {
-  var ret = value;
+  let ret = value;
   if (value === undefined) {
     ret = [];
   } else if (!Array.isArray(value)) {
@@ -78,7 +85,7 @@ export function toArray(value) {
 }
 
 export function getMapKey(value) {
-  return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) + '-' + value;
+  return `${typeof value}-${value}`;
 }
 
 export function preventDefaultEvent(e) {
@@ -86,9 +93,9 @@ export function preventDefaultEvent(e) {
 }
 
 export function findIndexInValueBySingleValue(value, singleValue) {
-  var index = -1;
+  let index = -1;
   if (value) {
-    for (var i = 0; i < value.length; i++) {
+    for (let i = 0; i < value.length; i++) {
       if (value[i] === singleValue) {
         index = i;
         break;
@@ -99,10 +106,10 @@ export function findIndexInValueBySingleValue(value, singleValue) {
 }
 
 export function getLabelFromPropsValue(value, key) {
-  var label = void 0;
+  let label;
   value = toArray(value);
   if (value) {
-    for (var i = 0; i < value.length; i++) {
+    for (let i = 0; i < value.length; i++) {
       if (value[i].key === key) {
         label = value[i].label;
         break;
@@ -116,13 +123,13 @@ export function getSelectKeys(menuItems, value) {
   if (value === null || value === undefined) {
     return [];
   }
-  var selectedKeys = [];
-  menuItems.forEach(function (item) {
+  let selectedKeys = [];
+  menuItems.forEach(item => {
     if (getSlotOptions(item).isMenuItemGroup) {
       selectedKeys = selectedKeys.concat(getSelectKeys(item.componentOptions.children, value));
     } else {
-      var itemValue = getValuePropValue(item);
-      var itemKey = item.key;
+      const itemValue = getValuePropValue(item);
+      const itemKey = item.key;
       if (findIndexInValueBySingleValue(value, itemValue) !== -1 && itemKey !== undefined) {
         selectedKeys.push(itemKey);
       }
@@ -131,21 +138,21 @@ export function getSelectKeys(menuItems, value) {
   return selectedKeys;
 }
 
-export var UNSELECTABLE_STYLE = {
+export const UNSELECTABLE_STYLE = {
   userSelect: 'none',
-  WebkitUserSelect: 'none'
+  WebkitUserSelect: 'none',
 };
 
-export var UNSELECTABLE_ATTRIBUTE = {
-  unselectable: 'on'
+export const UNSELECTABLE_ATTRIBUTE = {
+  unselectable: 'on',
 };
 
 export function findFirstMenuItem(children) {
-  for (var i = 0; i < children.length; i++) {
-    var child = children[i];
-    var props = getPropsData(child);
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    const props = getPropsData(child);
     if (getSlotOptions(child).isMenuItemGroup) {
-      var found = findFirstMenuItem(child.componentOptions.children);
+      const found = findFirstMenuItem(child.componentOptions.children);
       if (found) {
         return found;
       }
@@ -157,7 +164,7 @@ export function findFirstMenuItem(children) {
 }
 
 export function includesSeparators(str, separators) {
-  for (var i = 0; i < separators.length; ++i) {
+  for (let i = 0; i < separators.length; ++i) {
     if (str.lastIndexOf(separators[i]) > 0) {
       return true;
     }
@@ -166,18 +173,16 @@ export function includesSeparators(str, separators) {
 }
 
 export function splitBySeparators(str, separators) {
-  var reg = new RegExp('[' + separators.join() + ']');
-  return str.split(reg).filter(function (token) {
-    return token;
-  });
+  const reg = new RegExp(`[${separators.join()}]`);
+  return str.split(reg).filter(token => token);
 }
 
 export function defaultFilterFn(input, child) {
-  var props = getPropsData(child);
+  const props = getPropsData(child);
   if (props.disabled) {
     return false;
   }
-  var value = getPropValue(child, this.optionFilterProp);
+  let value = getPropValue(child, this.optionFilterProp);
   if (value.length && value[0].text) {
     value = value[0].text;
   } else {
@@ -191,12 +196,15 @@ export function validateOptionValue(value, props) {
     return;
   }
   if (typeof value !== 'string') {
-    throw new Error('Invalid `value` of type `' + (typeof value === 'undefined' ? 'undefined' : _typeof(value)) + '` supplied to Option, ' + 'expected `string` when `tags/combobox` is `true`.');
+    throw new Error(
+      `Invalid \`value\` of type \`${typeof value}\` supplied to Option, ` +
+        `expected \`string\` when \`tags/combobox\` is \`true\`.`,
+    );
   }
 }
 
 export function saveRef(instance, name) {
-  return function (node) {
+  return node => {
     instance[name] = node;
   };
 }
@@ -205,11 +213,11 @@ export function generateUUID() {
   if (process.env.NODE_ENV === 'test') {
     return 'test-uuid';
   }
-  var d = new Date().getTime();
-  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (d + Math.random() * 16) % 16 | 0;
+  let d = new Date().getTime();
+  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (d + Math.random() * 16) % 16 | 0;
     d = Math.floor(d / 16);
-    return (c === 'x' ? r : r & 0x7 | 0x8).toString(16);
+    return (c === 'x' ? r : (r & 0x7) | 0x8).toString(16);
   });
   return uuid;
 }

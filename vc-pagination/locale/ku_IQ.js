@@ -11,5 +11,5 @@ export default {
   prev_5: '5 Rûpelên Pêş',
   next_5: '5 Rûpelên Paş',
   prev_3: '3 Rûpelên Pêş',
-  next_3: '3 Rûpelên Paş'
+  next_3: '3 Rûpelên Paş',
 };

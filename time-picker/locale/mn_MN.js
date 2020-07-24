@@ -1,5 +1,5 @@
-var locale = {
-  placeholder: 'Цаг сонгох'
+const locale = {
+  placeholder: 'Цаг сонгох',
 };
 
 export default locale;

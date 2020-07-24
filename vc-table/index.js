@@ -1,72 +1,79 @@
-import _extends from 'babel-runtime/helpers/extends';
-// base rc-table 6.4.3
+// base rc-table 6.10.9
 import T from './src/Table';
 import Column from './src/Column';
 import ColumnGroup from './src/ColumnGroup';
-import { getOptionProps, getKey, getClass, getStyle, getEvents, getSlotOptions, camelize, getSlots } from '../_util/props-util';
-var Table = {
+import {
+  getOptionProps,
+  getKey,
+  getClass,
+  getStyle,
+  getEvents,
+  getSlotOptions,
+  camelize,
+  getSlots,
+  getListeners,
+} from '../_util/props-util';
+import { INTERNAL_COL_DEFINE } from './src/utils';
+const Table = {
   name: 'Table',
-  Column: Column,
-  ColumnGroup: ColumnGroup,
+  Column,
+  ColumnGroup,
   props: T.props,
   methods: {
-    normalize: function normalize() {
-      var _this = this;
-
-      var elements = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-      var columns = [];
-      elements.forEach(function (element) {
+    getTableNode() {
+      return this.$refs.table.tableNode;
+    },
+    getBodyTable() {
+      return this.$refs.table.ref_bodyTable;
+    },
+    normalize(elements = []) {
+      const columns = [];
+      elements.forEach(element => {
         if (!element.tag) {
           return;
         }
-        var key = getKey(element);
-        var style = getStyle(element);
-        var cls = getClass(element);
-        var props = getOptionProps(element);
-        var events = getEvents(element);
-        var listeners = {};
-        Object.keys(events).forEach(function (e) {
-          var k = 'on-' + e;
+        const key = getKey(element);
+        const style = getStyle(element);
+        const cls = getClass(element);
+        const props = getOptionProps(element);
+        const events = getEvents(element);
+        const listeners = {};
+        Object.keys(events).forEach(e => {
+          const k = `on-${e}`;
           listeners[camelize(k)] = events[e];
         });
-
-        var _getSlots = getSlots(element),
-            children = _getSlots['default'],
-            title = _getSlots.title;
-
-        var column = _extends({ title: title }, props, { style: style, 'class': cls }, listeners);
+        const { default: children, title } = getSlots(element);
+        const column = { title, ...props, style, class: cls, ...listeners };
         if (key) {
           column.key = key;
         }
         if (getSlotOptions(element).isTableColumnGroup) {
-          column.children = _this.normalize(typeof children === 'function' ? children() : children);
+          column.children = this.normalize(typeof children === 'function' ? children() : children);
         } else {
-          var customRender = element.data && element.data.scopedSlots && element.data.scopedSlots['default'];
+          const customRender =
+            element.data && element.data.scopedSlots && element.data.scopedSlots.default;
           column.customRender = column.customRender || customRender;
         }
         columns.push(column);
       });
       return columns;
-    }
+    },
   },
-  render: function render() {
-    var h = arguments[0];
-    var $listeners = this.$listeners,
-        $slots = this.$slots,
-        normalize = this.normalize;
-
-    var props = getOptionProps(this);
-    var columns = props.columns || normalize($slots['default']);
-    var tProps = {
-      props: _extends({}, props, {
-        columns: columns
-      }),
-      on: $listeners
+  render() {
+    const { $slots, normalize } = this;
+    const props = getOptionProps(this);
+    const columns = props.columns || normalize($slots.default);
+    const tProps = {
+      props: {
+        ...props,
+        columns,
+      },
+      on: getListeners(this),
+      ref: 'table',
     };
-    return h(T, tProps);
-  }
+    return <T {...tProps} />;
+  },
 };
 
 export default Table;
-export { Column, ColumnGroup };
+export { Column, ColumnGroup, INTERNAL_COL_DEFINE };

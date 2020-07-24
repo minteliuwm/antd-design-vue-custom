@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Fyrri áratugur',
   nextDecade: 'Næsti áratugur',
   previousCentury: 'Fyrri öld',
-  nextCentury: 'Næsta öld'
+  nextCentury: 'Næsta öld',
 };

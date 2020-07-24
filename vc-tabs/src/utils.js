@@ -1,7 +1,6 @@
-import _defineProperty from 'babel-runtime/helpers/defineProperty';
 export function toArray(children) {
-  var c = [];
-  children.forEach(function (child) {
+  const c = [];
+  children.forEach(child => {
     if (child.data) {
       c.push(child);
     }
@@ -10,8 +9,8 @@ export function toArray(children) {
 }
 
 export function getActiveIndex(children, activeKey) {
-  var c = toArray(children);
-  for (var i = 0; i < c.length; i++) {
+  const c = toArray(children);
+  for (let i = 0; i < c.length; i++) {
     if (c[i].key === activeKey) {
       return i;
     }
@@ -20,7 +19,7 @@ export function getActiveIndex(children, activeKey) {
 }
 
 export function getActiveKey(children, index) {
-  var c = toArray(children);
+  const c = toArray(children);
   return c[index].key;
 }
 
@@ -30,8 +29,10 @@ export function setTransform(style, v) {
   style.mozTransform = v;
 }
 
-export function isTransformSupported(style) {
-  return 'transform' in style || 'webkitTransform' in style || 'MozTransform' in style;
+export function isTransform3dSupported(style) {
+  return (
+    ('transform' in style || 'webkitTransform' in style || 'MozTransform' in style) && window.atob
+  );
 }
 
 export function setTransition(style, v) {
@@ -43,7 +44,7 @@ export function getTransformPropValue(v) {
   return {
     transform: v,
     WebkitTransform: v,
-    MozTransform: v
+    MozTransform: v,
   };
 }
 
@@ -51,27 +52,35 @@ export function isVertical(tabBarPosition) {
   return tabBarPosition === 'left' || tabBarPosition === 'right';
 }
 
-export function getTransformByIndex(index, tabBarPosition) {
-  var translate = isVertical(tabBarPosition) ? 'translateY' : 'translateX';
-  return translate + '(' + -index * 100 + '%) translateZ(0)';
+export function getTransformByIndex(index, tabBarPosition, direction = 'ltr') {
+  const translate = isVertical(tabBarPosition) ? 'translateY' : 'translateX';
+  if (!isVertical(tabBarPosition) && direction === 'rtl') {
+    return `${translate}(${index * 100}%) translateZ(0)`;
+  }
+  return `${translate}(${-index * 100}%) translateZ(0)`;
 }
 
 export function getMarginStyle(index, tabBarPosition) {
-  var marginDirection = isVertical(tabBarPosition) ? 'marginTop' : 'marginLeft';
-  return _defineProperty({}, marginDirection, -index * 100 + '%');
+  const marginDirection = isVertical(tabBarPosition) ? 'marginTop' : 'marginLeft';
+  return {
+    [marginDirection]: `${-index * 100}%`,
+  };
 }
 
 export function getStyle(el, property) {
-  return +window.getComputedStyle(el).getPropertyValue(property).replace('px', '');
+  return +window
+    .getComputedStyle(el)
+    .getPropertyValue(property)
+    .replace('px', '');
 }
 
 export function setPxStyle(el, value, vertical) {
-  value = vertical ? '0px, ' + value + 'px, 0px' : value + 'px, 0px, 0px';
-  setTransform(el.style, 'translate3d(' + value + ')');
+  value = vertical ? `0px, ${value}px, 0px` : `${value}px, 0px, 0px`;
+  setTransform(el.style, `translate3d(${value})`);
 }
 
 export function getDataAttr(props) {
-  return Object.keys(props).reduce(function (prev, key) {
+  return Object.keys(props).reduce((prev, key) => {
     if (key.substr(0, 5) === 'aria-' || key.substr(0, 5) === 'data-' || key === 'role') {
       prev[key] = props[key];
     }
@@ -84,29 +93,28 @@ function toNum(style, property) {
 }
 
 function getTypeValue(start, current, end, tabNode, wrapperNode) {
-  var total = getStyle(wrapperNode, 'padding-' + start);
+  let total = getStyle(wrapperNode, `padding-${start}`);
   if (!tabNode || !tabNode.parentNode) {
     return total;
   }
 
-  var childNodes = tabNode.parentNode.childNodes;
-
-  Array.prototype.some.call(childNodes, function (node) {
-    var style = window.getComputedStyle(node);
+  const { childNodes } = tabNode.parentNode;
+  Array.prototype.some.call(childNodes, node => {
+    const style = window.getComputedStyle(node);
     if (node !== tabNode) {
-      total += toNum(style, 'margin-' + start);
+      total += toNum(style, `margin-${start}`);
       total += node[current];
-      total += toNum(style, 'margin-' + end);
+      total += toNum(style, `margin-${end}`);
 
       if (style.boxSizing === 'content-box') {
-        total += toNum(style, 'border-' + start + '-width') + toNum(style, 'border-' + end + '-width');
+        total += toNum(style, `border-${start}-width`) + toNum(style, `border-${end}-width`);
       }
       return false;
     }
 
     // We need count current node margin
     // ref: https://github.com/react-component/tabs/pull/139#issuecomment-431005262
-    total += toNum(style, 'margin-' + start);
+    total += toNum(style, `margin-${start}`);
 
     return true;
   });

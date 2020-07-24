@@ -1,14 +1,9 @@
-import _toConsumableArray from 'babel-runtime/helpers/toConsumableArray';
-import _extends from 'babel-runtime/helpers/extends';
-export function flatArray() {
-  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-  var childrenName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'children';
-
-  var result = [];
-  var loop = function loop(array) {
-    array.forEach(function (item) {
+export function flatArray(data = [], childrenName = 'children') {
+  const result = [];
+  const loop = array => {
+    array.forEach(item => {
       if (item[childrenName]) {
-        var newItem = _extends({}, item);
+        const newItem = { ...item };
         delete newItem[childrenName];
         result.push(newItem);
         if (item[childrenName].length > 0) {
@@ -23,26 +18,27 @@ export function flatArray() {
   return result;
 }
 
-export function treeMap(tree, mapper) {
-  var childrenName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'children';
-
-  return tree.map(function (node, index) {
-    var extra = {};
+export function treeMap(tree, mapper, childrenName = 'children') {
+  return tree.map((node, index) => {
+    const extra = {};
     if (node[childrenName]) {
       extra[childrenName] = treeMap(node[childrenName], mapper, childrenName);
     }
-    return _extends({}, mapper(node, index), extra);
+    return {
+      ...mapper(node, index),
+      ...extra,
+    };
   });
 }
 
 export function flatFilter(tree, callback) {
-  return tree.reduce(function (acc, node) {
+  return tree.reduce((acc, node) => {
     if (callback(node)) {
       acc.push(node);
     }
     if (node.children) {
-      var children = flatFilter(node.children, callback);
-      acc.push.apply(acc, _toConsumableArray(children));
+      const children = flatFilter(node.children, callback);
+      acc.push(...children);
     }
     return acc;
   }, []);
@@ -67,3 +63,11 @@ export function flatFilter(tree, callback) {
 //   })
 //   return columns
 // }
+
+export function generateValueMaps(items, maps = {}) {
+  (items || []).forEach(({ value, children }) => {
+    maps[value.toString()] = value;
+    generateValueMaps(children, maps);
+  });
+  return maps;
+}

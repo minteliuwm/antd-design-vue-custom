@@ -1,6 +1,6 @@
 import PropTypes from '../../_util/vue-types';
 
-var defaultProps = {
+const defaultProps = {
   accessibility: PropTypes.bool.def(true),
   // 自定义高度
   adaptiveHeight: PropTypes.bool.def(false),
@@ -50,7 +50,7 @@ var defaultProps = {
   vertical: PropTypes.bool.def(false),
   waitForAnimate: PropTypes.bool.def(true),
   children: PropTypes.array,
-  __propsSymbol__: PropTypes.any
+  __propsSymbol__: PropTypes.any,
 };
 
 export default defaultProps;

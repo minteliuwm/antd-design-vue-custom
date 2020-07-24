@@ -24,5 +24,5 @@ export default {
   previousDecade: 'Өмнөх арван',
   nextDecade: 'Дараа арван',
   previousCentury: 'Өмнөх зуун',
-  nextCentury: 'Дараа зуун'
+  nextCentury: 'Дараа зуун',
 };

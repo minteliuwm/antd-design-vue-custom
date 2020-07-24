@@ -8,7 +8,7 @@ import Base from '../base';
 Dropdown.Button = DropdownButton;
 
 /* istanbul ignore next */
-Dropdown.install = function (Vue) {
+Dropdown.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Dropdown.name, Dropdown);
   Vue.component(DropdownButton.name, DropdownButton);

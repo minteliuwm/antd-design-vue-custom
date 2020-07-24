@@ -1,7 +1,9 @@
 import getScrollBarSize from './getScrollBarSize';
 
-export default (function (close) {
-  var bodyIsOverflowing = document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight) && window.innerWidth > document.body.offsetWidth;
+export default close => {
+  const bodyIsOverflowing =
+    document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight) &&
+    window.innerWidth > document.body.offsetWidth;
   if (!bodyIsOverflowing) {
     return;
   }
@@ -10,9 +12,9 @@ export default (function (close) {
     document.body.style.width = '';
     return;
   }
-  var scrollBarSize = getScrollBarSize();
+  const scrollBarSize = getScrollBarSize();
   if (scrollBarSize) {
     document.body.style.position = 'relative';
-    document.body.style.width = 'calc(100% - ' + scrollBarSize + 'px)';
+    document.body.style.width = `calc(100% - ${scrollBarSize}px)`;
   }
-});
+};

@@ -1,3 +1,19 @@
+/* @remove-on-es-build-begin */
+// this file is not used if use https://github.com/ant-design/babel-plugin-import
+const ENV = process.env.NODE_ENV;
+if (
+  ENV !== 'production' &&
+  ENV !== 'test' &&
+  typeof console !== 'undefined' &&
+  console.warn &&
+  typeof window !== 'undefined'
+) {
+  console.warn(
+    'You are using a whole package of antd, ' +
+      'please use https://www.npmjs.com/package/babel-plugin-import to reduce app bundle size.',
+  );
+}
+/* @remove-on-es-build-end */
 
 import { default as Affix } from './affix';
 
@@ -40,6 +56,7 @@ import { default as Divider } from './divider';
 import { default as Dropdown } from './dropdown';
 
 import { default as Form } from './form';
+import { default as FormModel } from './form-model';
 
 import { default as Icon } from './icon';
 
@@ -56,6 +73,8 @@ import { default as LocaleProvider } from './locale-provider';
 import { default as message } from './message';
 
 import { default as Menu } from './menu';
+
+import { default as Mentions } from './mentions';
 
 import { default as Modal } from './modal';
 
@@ -117,14 +136,85 @@ import { default as Skeleton } from './skeleton';
 
 import { default as Comment } from './comment';
 
+// import { default as ColorPicker } from './color-picker';
+
 import { default as ConfigProvider } from './config-provider';
 
 import { default as Empty } from './empty';
 
-var components = [Base, Affix, Anchor, AutoComplete, Alert, Avatar, BackTop, Badge, Breadcrumb, Button, Calendar, Card, Collapse, Carousel, Cascader, Checkbox, Col, DatePicker, Divider, Dropdown, Form, Icon, Input, InputNumber, Layout, List, LocaleProvider, Menu, Modal, Pagination, Popconfirm, Popover, Progress, Radio, Rate, Row, Select, Slider, Spin, Statistic, Steps, Switch, Table, Transfer, Tree, TreeSelect, Tabs, Tag, TimePicker, Timeline, Tooltip, Upload, Drawer, Skeleton, Comment, ConfigProvider, Empty];
+import { default as Result } from './result';
 
-var install = function install(Vue) {
-  components.map(function (component) {
+import { default as Descriptions } from './descriptions';
+import { default as PageHeader } from './page-header';
+
+const components = [
+  Base,
+  Affix,
+  Anchor,
+  AutoComplete,
+  Alert,
+  Avatar,
+  BackTop,
+  Badge,
+  Breadcrumb,
+  Button,
+  Calendar,
+  Card,
+  Collapse,
+  Carousel,
+  Cascader,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
+  Dropdown,
+  Form,
+  FormModel,
+  Icon,
+  Input,
+  InputNumber,
+  Layout,
+  List,
+  LocaleProvider,
+  Menu,
+  Mentions,
+  Modal,
+  Pagination,
+  Popconfirm,
+  Popover,
+  Progress,
+  Radio,
+  Rate,
+  Row,
+  Select,
+  Slider,
+  Spin,
+  Statistic,
+  Steps,
+  Switch,
+  Table,
+  Transfer,
+  Tree,
+  TreeSelect,
+  Tabs,
+  Tag,
+  TimePicker,
+  Timeline,
+  Tooltip,
+  Upload,
+  Drawer,
+  Skeleton,
+  Comment,
+  // ColorPicker,
+  ConfigProvider,
+  Empty,
+  Result,
+  Descriptions,
+  PageHeader,
+];
+
+const install = function(Vue) {
+  components.map(component => {
     Vue.use(component);
   });
 
@@ -143,9 +233,77 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue);
 }
 
-export { Base, version, install, message, notification, Affix, Anchor, AutoComplete, Alert, Avatar, BackTop, Badge, Breadcrumb, Button, Calendar, Card, Collapse, Carousel, Cascader, Checkbox, Col, DatePicker, Divider, Dropdown, Form, Icon, Input, InputNumber, Layout, List, LocaleProvider, Menu, Modal, Pagination, Popconfirm, Popover, Progress, Radio, Rate, Row, Select, Slider, Spin, Statistic, Steps, Switch, Table, Transfer, Tree, TreeSelect, Tabs, Tag, TimePicker, Timeline, Tooltip, Upload, Drawer, Skeleton, Comment, ConfigProvider, Empty };
+export {
+  Base,
+  version,
+  install,
+  message,
+  notification,
+  Affix,
+  Anchor,
+  AutoComplete,
+  Alert,
+  Avatar,
+  BackTop,
+  Badge,
+  Breadcrumb,
+  Button,
+  Calendar,
+  Card,
+  Collapse,
+  Carousel,
+  Cascader,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
+  Dropdown,
+  Form,
+  FormModel,
+  Icon,
+  Input,
+  InputNumber,
+  Layout,
+  List,
+  LocaleProvider,
+  Menu,
+  Mentions,
+  Modal,
+  Pagination,
+  Popconfirm,
+  Popover,
+  Progress,
+  Radio,
+  Rate,
+  Row,
+  Select,
+  Slider,
+  Spin,
+  Statistic,
+  Steps,
+  Switch,
+  Table,
+  Transfer,
+  Tree,
+  TreeSelect,
+  Tabs,
+  Tag,
+  TimePicker,
+  Timeline,
+  Tooltip,
+  Upload,
+  Drawer,
+  Skeleton,
+  Comment,
+  // ColorPicker,
+  ConfigProvider,
+  Empty,
+  Result,
+  Descriptions,
+  PageHeader,
+};
 
 export default {
-  version: version,
-  install: install
+  version,
+  install,
 };

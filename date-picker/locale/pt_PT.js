@@ -1,10 +1,10 @@
-import _extends from 'babel-runtime/helpers/extends';
 import CalendarLocale from '../../vc-calendar/src/locale/pt_PT';
 import TimePickerLocale from '../../time-picker/locale/pt_PT';
 
 // Merge into a locale object
-var locale = {
-  lang: _extends({}, CalendarLocale, {
+const locale = {
+  lang: {
+    ...CalendarLocale,
     placeholder: 'Data',
     rangePlaceholder: ['Data inicial', 'Data final'],
     today: 'Hoje',
@@ -32,15 +32,15 @@ var locale = {
     previousDecade: 'Última década',
     nextDecade: 'Próxima década',
     previousCentury: 'Último século',
-    nextCentury: 'Próximo século'
-  }),
-  timePickerLocale: _extends({}, TimePickerLocale, {
-    placeholder: 'Hora'
-  })
+    nextCentury: 'Próximo século',
+  },
+  timePickerLocale: {
+    ...TimePickerLocale,
+    placeholder: 'Hora',
+  },
 };
 
 // All settings at:
-// https://github.com/ant-design/ant-design/blob/master/components/date-picker/lo
-// cale/example.json
+// https://github.com/ant-design/ant-design/blob/master/components/date-picker/locale/example.json
 
 export default locale;

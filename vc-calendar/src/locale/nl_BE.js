@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Vorig decennium',
   nextDecade: 'Volgend decennium',
   previousCentury: 'Vorige eeuw',
-  nextCentury: 'Volgende eeuw'
+  nextCentury: 'Volgende eeuw',
 };

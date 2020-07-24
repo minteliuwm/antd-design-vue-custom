@@ -1,9 +1,8 @@
-import _extends from 'babel-runtime/helpers/extends';
 import classnames from 'classnames';
 import { cloneElement } from '../../_util/vnode';
 
-var getDotCount = function getDotCount(spec) {
-  var dots = void 0;
+const getDotCount = function(spec) {
+  let dots;
 
   if (spec.infinite) {
     dots = Math.ceil(spec.slideCount / spec.slidesToScroll);
@@ -16,47 +15,48 @@ var getDotCount = function getDotCount(spec) {
 
 export default {
   functional: true,
-  render: function render(createElement, context) {
-    var h = arguments[0];
-    var props = context.props,
-        listeners = context.listeners;
-    var slideCount = props.slideCount,
-        slidesToScroll = props.slidesToScroll,
-        slidesToShow = props.slidesToShow,
-        infinite = props.infinite,
-        currentSlide = props.currentSlide,
-        appendDots = props.appendDots,
-        customPaging = props.customPaging,
-        clickHandler = props.clickHandler,
-        dotsClass = props.dotsClass;
-
-    var dotCount = getDotCount({
-      slideCount: slideCount,
-      slidesToScroll: slidesToScroll,
-      slidesToShow: slidesToShow,
-      infinite: infinite
+  render(createElement, context) {
+    const { props, listeners } = context;
+    const {
+      slideCount,
+      slidesToScroll,
+      slidesToShow,
+      infinite,
+      currentSlide,
+      appendDots,
+      customPaging,
+      clickHandler,
+      dotsClass,
+    } = props;
+    const dotCount = getDotCount({
+      slideCount,
+      slidesToScroll,
+      slidesToShow,
+      infinite,
     });
 
     // Apply join & split to Array to pre-fill it for IE8
     //
     // Credit: http://stackoverflow.com/a/13735425/1849458
-    var mouseenter = listeners.mouseenter,
-        mouseover = listeners.mouseover,
-        mouseleave = listeners.mouseleave;
-
-    var mouseEvents = { mouseenter: mouseenter, mouseover: mouseover, mouseleave: mouseleave };
-    var dots = Array.apply(null, Array(dotCount + 1).join('0').split('')).map(function (x, i) {
-      var leftBound = i * slidesToScroll;
-      var rightBound = i * slidesToScroll + (slidesToScroll - 1);
-      var className = classnames({
-        'slick-active': currentSlide >= leftBound && currentSlide <= rightBound
+    const { mouseenter, mouseover, mouseleave } = listeners;
+    const mouseEvents = { mouseenter, mouseover, mouseleave };
+    const dots = Array.apply(
+      null,
+      Array(dotCount + 1)
+        .join('0')
+        .split(''),
+    ).map((x, i) => {
+      const leftBound = i * slidesToScroll;
+      const rightBound = i * slidesToScroll + (slidesToScroll - 1);
+      const className = classnames({
+        'slick-active': currentSlide >= leftBound && currentSlide <= rightBound,
       });
 
-      var dotOptions = {
+      const dotOptions = {
         message: 'dots',
         index: i,
-        slidesToScroll: slidesToScroll,
-        currentSlide: currentSlide
+        slidesToScroll,
+        currentSlide,
       };
       function onClick(e) {
         // In Autoplay the focus stays on clicked button even after transition
@@ -66,20 +66,22 @@ export default {
         }
         clickHandler(dotOptions);
       }
-      return h(
-        'li',
-        { key: i, 'class': className },
-        [cloneElement(customPaging({ i: i }), {
-          on: {
-            click: onClick
-          }
-        })]
+      return (
+        <li key={i} class={className}>
+          {cloneElement(customPaging({ i }), {
+            on: {
+              click: onClick,
+            },
+          })}
+        </li>
       );
     });
 
-    return cloneElement(appendDots({ dots: dots }), {
-      'class': dotsClass,
-      on: _extends({}, mouseEvents)
+    return cloneElement(appendDots({ dots }), {
+      class: dotsClass,
+      on: {
+        ...mouseEvents,
+      },
     });
-  }
+  },
 };

@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Önceki On Yıl',
   nextDecade: 'Sonraki On Yıl',
   previousCentury: 'Önceki Yüzyıl',
-  nextCentury: 'Sonraki Yüzyıl'
+  nextCentury: 'Sonraki Yüzyıl',
 };

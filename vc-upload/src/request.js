@@ -1,14 +1,14 @@
 function getError(option, xhr) {
-  var msg = 'cannot post ' + option.action + ' ' + xhr.status + '\'';
-  var err = new Error(msg);
+  const msg = `cannot ${option.method} ${option.action} ${xhr.status}'`;
+  const err = new Error(msg);
   err.status = xhr.status;
-  err.method = 'post';
+  err.method = option.method;
   err.url = option.action;
   return err;
 }
 
 function getBody(xhr) {
-  var text = xhr.responseText || xhr.response;
+  const text = xhr.responseText || xhr.response;
   if (!text) {
     return text;
   }
@@ -32,21 +32,32 @@ function getBody(xhr) {
 //  headers: Object,
 // }
 export default function upload(option) {
-  var xhr = new window.XMLHttpRequest();
+  const xhr = new window.XMLHttpRequest();
 
   if (option.onProgress && xhr.upload) {
     xhr.upload.onprogress = function progress(e) {
       if (e.total > 0) {
-        e.percent = e.loaded / e.total * 100;
+        e.percent = (e.loaded / e.total) * 100;
       }
       option.onProgress(e);
     };
   }
 
-  var formData = new window.FormData();
+  const formData = new window.FormData();
 
   if (option.data) {
-    Object.keys(option.data).map(function (key) {
+    Object.keys(option.data).forEach(key => {
+      const value = option.data[key];
+      // support key-value array data
+      if (Array.isArray(value)) {
+        value.forEach(item => {
+          // { list: [ 11, 22 ] }
+          // formData.append('list[]', 11);
+          formData.append(`${key}[]`, item);
+        });
+        return;
+      }
+
       formData.append(key, option.data[key]);
     });
   }
@@ -67,14 +78,14 @@ export default function upload(option) {
     option.onSuccess(getBody(xhr), xhr);
   };
 
-  xhr.open('post', option.action, true);
+  xhr.open(option.method, option.action, true);
 
   // Has to be after `.open()`. See https://github.com/enyo/dropzone/issues/179
   if (option.withCredentials && 'withCredentials' in xhr) {
     xhr.withCredentials = true;
   }
 
-  var headers = option.headers || {};
+  const headers = option.headers || {};
 
   // when set headers['X-Requested-With'] = null , can close default XHR header
   // see https://github.com/react-component/upload/issues/33
@@ -82,7 +93,7 @@ export default function upload(option) {
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
   }
 
-  for (var h in headers) {
+  for (const h in headers) {
     if (headers.hasOwnProperty(h) && headers[h] !== null) {
       xhr.setRequestHeader(h, headers[h]);
     }
@@ -90,8 +101,8 @@ export default function upload(option) {
   xhr.send(formData);
 
   return {
-    abort: function abort() {
+    abort() {
       xhr.abort();
-    }
+    },
   };
 }

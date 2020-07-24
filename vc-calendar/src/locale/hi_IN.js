@@ -24,5 +24,5 @@ export default {
   previousDecade: 'पिछला दशक',
   nextDecade: 'अगले दशक',
   previousCentury: 'पीछ्ली शताब्दी',
-  nextCentury: 'अगली सदी'
+  nextCentury: 'अगली सदी',
 };

@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Προηγούμενη δεκαετία',
   nextDecade: 'Επόμενη δεκαετία',
   previousCentury: 'Προηγούμενος αιώνας',
-  nextCentury: 'Επόμενος αιώνας'
+  nextCentury: 'Επόμενος αιώνας',
 };

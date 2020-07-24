@@ -1,20 +1,19 @@
-import _extends from 'babel-runtime/helpers/extends';
 import PropTypes from '../_util/vue-types';
 import { PaginationProps as getPaginationProps } from '../pagination';
 import { SpinProps as getSpinProps } from '../spin';
 import { Store } from './createStore';
 
-var PaginationProps = getPaginationProps();
-var SpinProps = getSpinProps();
+const PaginationProps = getPaginationProps();
+const SpinProps = getSpinProps();
 
 // export type CompareFn<T> = ((a: T, b: T) => number);
-export var ColumnFilterItem = PropTypes.shape({
+export const ColumnFilterItem = PropTypes.shape({
   text: PropTypes.string,
   value: PropTypes.string,
-  children: PropTypes.array
+  children: PropTypes.array,
 }).loose;
 
-export var ColumnProps = {
+export const ColumnProps = {
   title: PropTypes.any,
   // key?: React.Key;
   dataIndex: PropTypes.string,
@@ -22,6 +21,7 @@ export var ColumnProps = {
   customCell: PropTypes.func,
   customHeaderCell: PropTypes.func,
   align: PropTypes.oneOf(['left', 'right', 'center']),
+  ellipsis: PropTypes.bool,
   filters: PropTypes.arrayOf(ColumnFilterItem),
   // onFilter: (value: any, record: T) => PropTypes.bool,
   filterMultiple: PropTypes.bool,
@@ -36,8 +36,10 @@ export var ColumnProps = {
   fixed: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(['left', 'right'])]),
   filterIcon: PropTypes.any,
   filteredValue: PropTypes.array,
+  filtered: PropTypes.bool,
+  defaultFilteredValue: PropTypes.array,
   sortOrder: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(['ascend', 'descend'])]),
-  sortDirections: PropTypes.array
+  sortDirections: PropTypes.array,
   // children?: ColumnProps<T>[];
   // onCellClick?: (record: T, event: any) => void;
   // onCell?: (record: T) => any;
@@ -58,20 +60,22 @@ export var ColumnProps = {
 //   };
 // }
 
-export var TableLocale = PropTypes.shape({
+export const TableLocale = PropTypes.shape({
   filterTitle: PropTypes.string,
   filterConfirm: PropTypes.any,
   filterReset: PropTypes.any,
   emptyText: PropTypes.any,
   selectAll: PropTypes.any,
   selectInvert: PropTypes.any,
-  sortTitle: PropTypes.string
+  sortTitle: PropTypes.string,
+  expand: PropTypes.string,
+  collapse: PropTypes.string,
 }).loose;
 
-export var RowSelectionType = PropTypes.oneOf(['checkbox', 'radio']);
+export const RowSelectionType = PropTypes.oneOf(['checkbox', 'radio']);
 // export type SelectionSelectFn<T> = (record: T, selected: boolean, selectedRows: Object[]) => any;
 
-export var TableRowSelection = {
+export const TableRowSelection = {
   type: RowSelectionType,
   selectedRowKeys: PropTypes.array,
   // onChange?: (selectedRowKeys: string[] | number[], selectedRows: Object[]) => any;
@@ -84,16 +88,20 @@ export var TableRowSelection = {
   fixed: PropTypes.bool,
   columnWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   selectWay: PropTypes.oneOf(['onSelect', 'onSelectMultiple', 'onSelectAll', 'onSelectInvert']),
-  columnTitle: PropTypes.any
+  columnTitle: PropTypes.any,
 };
 
-export var TableProps = {
+export const TableProps = {
   prefixCls: PropTypes.string,
   dropdownPrefixCls: PropTypes.string,
   rowSelection: PropTypes.oneOfType([PropTypes.shape(TableRowSelection).loose, null]),
-  pagination: PropTypes.oneOfType([PropTypes.shape(_extends({}, PaginationProps, {
-    position: PropTypes.oneOf(['top', 'bottom', 'both'])
-  })).loose, PropTypes.bool]),
+  pagination: PropTypes.oneOfType([
+    PropTypes.shape({
+      ...PaginationProps,
+      position: PropTypes.oneOf(['top', 'bottom', 'both']),
+    }).loose,
+    PropTypes.bool,
+  ]),
   size: PropTypes.oneOf(['default', 'middle', 'small', 'large']),
   dataSource: PropTypes.array,
   components: PropTypes.object,
@@ -125,7 +133,10 @@ export var TableProps = {
   childrenColumnName: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   bodyStyle: PropTypes.any,
   sortDirections: PropTypes.array,
-  expandIcon: PropTypes.func
+  tableLayout: PropTypes.string,
+  getPopupContainer: PropTypes.func,
+  expandIcon: PropTypes.func,
+  transformCellText: PropTypes.func,
   // className?: PropTypes.string,
   // style?: React.CSSProperties;
   // children?: React.ReactNode;
@@ -150,7 +161,7 @@ export var TableProps = {
 //   onSelect: SelectionItemSelectFn;
 // }
 
-export var SelectionCheckboxAllProps = {
+export const SelectionCheckboxAllProps = {
   store: Store,
   locale: PropTypes.any,
   disabled: PropTypes.bool,
@@ -161,7 +172,7 @@ export var SelectionCheckboxAllProps = {
   // onSelect: (key: string, index: number, selectFunc: any) => void;
   hideDefaultSelections: PropTypes.bool,
   selections: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  getPopupContainer: PropTypes.func
+  getPopupContainer: PropTypes.func,
 };
 
 // export interface SelectionCheckboxAllState {
@@ -169,14 +180,14 @@ export var SelectionCheckboxAllProps = {
 //   indeterminate: PropTypes.bool,
 // }
 
-export var SelectionBoxProps = {
+export const SelectionBoxProps = {
   store: Store,
   type: RowSelectionType,
   defaultSelection: PropTypes.arrayOf([PropTypes.string, PropTypes.number]),
   rowIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   name: PropTypes.string,
   disabled: PropTypes.bool,
-  id: PropTypes.string
+  id: PropTypes.string,
   // onChange: React.ChangeEventHandler<HTMLInputElement>;
 };
 
@@ -184,7 +195,7 @@ export var SelectionBoxProps = {
 //   checked?: PropTypes.bool,
 // }
 
-export var FilterMenuProps = {
+export const FilterMenuProps = {
   _propsSymbol: PropTypes.any,
   locale: TableLocale,
   selectedKeys: PropTypes.arrayOf([PropTypes.string, PropTypes.number]),
@@ -193,7 +204,7 @@ export var FilterMenuProps = {
   prefixCls: PropTypes.string,
   dropdownPrefixCls: PropTypes.string,
   getPopupContainer: PropTypes.func,
-  handleFilter: PropTypes.func
+  handleFilter: PropTypes.func,
 };
 
 // export interface FilterMenuState {

@@ -10,5 +10,5 @@ export default {
   prev_5: '5 forrige',
   next_5: '5 neste',
   prev_3: '3 forrige',
-  next_3: '3 neste'
+  next_3: '3 neste',
 };

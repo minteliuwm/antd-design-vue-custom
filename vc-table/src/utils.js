@@ -1,32 +1,34 @@
-import warning from 'warning';
-
-var scrollbarVerticalSize = void 0;
-var scrollbarHorizontalSize = void 0;
+let scrollbarVerticalSize;
+let scrollbarHorizontalSize;
 
 // Measure scrollbar width for padding body during modal show/hide
-var scrollbarMeasure = {
+const scrollbarMeasure = {
   position: 'absolute',
   top: '-9999px',
   width: '50px',
-  height: '50px'
+  height: '50px',
 };
 
-export function measureScrollbar() {
-  var direction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'vertical';
+export const INTERNAL_COL_DEFINE = 'RC_TABLE_INTERNAL_COL_DEFINE';
 
+export function measureScrollbar({ direction = 'vertical', prefixCls }) {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return 0;
   }
-  var isVertical = direction === 'vertical';
+  const isVertical = direction === 'vertical';
   if (isVertical && scrollbarVerticalSize) {
     return scrollbarVerticalSize;
-  } else if (!isVertical && scrollbarHorizontalSize) {
+  }
+  if (!isVertical && scrollbarHorizontalSize) {
     return scrollbarHorizontalSize;
   }
-  var scrollDiv = document.createElement('div');
-  Object.keys(scrollbarMeasure).forEach(function (scrollProp) {
+  const scrollDiv = document.createElement('div');
+  Object.keys(scrollbarMeasure).forEach(scrollProp => {
     scrollDiv.style[scrollProp] = scrollbarMeasure[scrollProp];
   });
+  // apply hide scrollbar className ahead
+  scrollDiv.className = `${prefixCls}-hide-scrollbar scroll-div-append-to-body`;
+
   // Append related overflow style
   if (isVertical) {
     scrollDiv.style.overflowY = 'scroll';
@@ -34,11 +36,11 @@ export function measureScrollbar() {
     scrollDiv.style.overflowX = 'scroll';
   }
   document.body.appendChild(scrollDiv);
-  var size = 0;
+  let size = 0;
   if (isVertical) {
     size = scrollDiv.offsetWidth - scrollDiv.clientWidth;
     scrollbarVerticalSize = size;
-  } else if (!isVertical) {
+  } else {
     size = scrollDiv.offsetHeight - scrollDiv.clientHeight;
     scrollbarHorizontalSize = size;
   }
@@ -48,24 +50,20 @@ export function measureScrollbar() {
 }
 
 export function debounce(func, wait, immediate) {
-  var timeout = void 0;
-  function debounceFunc() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var context = this;
+  let timeout;
+  function debounceFunc(...args) {
+    const context = this;
     // https://fb.me/react-event-pooling
     if (args[0] && args[0].persist) {
       args[0].persist();
     }
-    var later = function later() {
+    const later = () => {
       timeout = null;
       if (!immediate) {
         func.apply(context, args);
       }
     };
-    var callNow = immediate && !timeout;
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
     if (callNow) {
@@ -81,17 +79,9 @@ export function debounce(func, wait, immediate) {
   return debounceFunc;
 }
 
-var warned = {};
-export function warningOnce(condition, format, args) {
-  if (!warned[format]) {
-    warning(condition, format, args);
-    warned[format] = !condition;
-  }
-}
-
 export function remove(array, item) {
-  var index = array.indexOf(item);
-  var front = array.slice(0, index);
-  var last = array.slice(index + 1, array.length);
+  const index = array.indexOf(item);
+  const front = array.slice(0, index);
+  const last = array.slice(index + 1, array.length);
   return front.concat(last);
 }

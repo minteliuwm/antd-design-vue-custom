@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Попереднє десятиріччя',
   nextDecade: 'Наступне десятиріччя',
   previousCentury: 'Попереднє століття',
-  nextCentury: 'Наступне століття'
+  nextCentury: 'Наступне століття',
 };

@@ -1,10 +1,10 @@
-var START_EVENT_NAME_MAP = {
+const START_EVENT_NAME_MAP = {
   transitionstart: {
     transition: 'transitionstart',
     WebkitTransition: 'webkitTransitionStart',
     MozTransition: 'mozTransitionStart',
     OTransition: 'oTransitionStart',
-    msTransition: 'MSTransitionStart'
+    msTransition: 'MSTransitionStart',
   },
 
   animationstart: {
@@ -12,17 +12,17 @@ var START_EVENT_NAME_MAP = {
     WebkitAnimation: 'webkitAnimationStart',
     MozAnimation: 'mozAnimationStart',
     OAnimation: 'oAnimationStart',
-    msAnimation: 'MSAnimationStart'
-  }
+    msAnimation: 'MSAnimationStart',
+  },
 };
 
-var END_EVENT_NAME_MAP = {
+const END_EVENT_NAME_MAP = {
   transitionend: {
     transition: 'transitionend',
     WebkitTransition: 'webkitTransitionEnd',
     MozTransition: 'mozTransitionEnd',
     OTransition: 'oTransitionEnd',
-    msTransition: 'MSTransitionEnd'
+    msTransition: 'MSTransitionEnd',
   },
 
   animationend: {
@@ -30,16 +30,16 @@ var END_EVENT_NAME_MAP = {
     WebkitAnimation: 'webkitAnimationEnd',
     MozAnimation: 'mozAnimationEnd',
     OAnimation: 'oAnimationEnd',
-    msAnimation: 'MSAnimationEnd'
-  }
+    msAnimation: 'MSAnimationEnd',
+  },
 };
 
-var startEvents = [];
-var endEvents = [];
+const startEvents = [];
+const endEvents = [];
 
 function detectEvents() {
-  var testEl = document.createElement('div');
-  var style = testEl.style;
+  const testEl = document.createElement('div');
+  const style = testEl.style;
 
   if (!('AnimationEvent' in window)) {
     delete START_EVENT_NAME_MAP.animationstart.animation;
@@ -52,10 +52,10 @@ function detectEvents() {
   }
 
   function process(EVENT_NAME_MAP, events) {
-    for (var baseEventName in EVENT_NAME_MAP) {
+    for (const baseEventName in EVENT_NAME_MAP) {
       if (EVENT_NAME_MAP.hasOwnProperty(baseEventName)) {
-        var baseEvents = EVENT_NAME_MAP[baseEventName];
-        for (var styleName in baseEvents) {
+        const baseEvents = EVENT_NAME_MAP[baseEventName];
+        for (const styleName in baseEvents) {
           if (styleName in style) {
             events.push(baseEvents[styleName]);
             break;
@@ -81,49 +81,50 @@ function removeEventListener(node, eventName, eventListener) {
   node.removeEventListener(eventName, eventListener, false);
 }
 
-var TransitionEvents = {
+const TransitionEvents = {
   // Start events
-  startEvents: startEvents,
+  startEvents,
 
-  addStartEventListener: function addStartEventListener(node, eventListener) {
+  addStartEventListener(node, eventListener) {
     if (startEvents.length === 0) {
       window.setTimeout(eventListener, 0);
       return;
     }
-    startEvents.forEach(function (startEvent) {
+    startEvents.forEach(startEvent => {
       addEventListener(node, startEvent, eventListener);
     });
   },
-  removeStartEventListener: function removeStartEventListener(node, eventListener) {
+
+  removeStartEventListener(node, eventListener) {
     if (startEvents.length === 0) {
       return;
     }
-    startEvents.forEach(function (startEvent) {
+    startEvents.forEach(startEvent => {
       removeEventListener(node, startEvent, eventListener);
     });
   },
 
-
   // End events
-  endEvents: endEvents,
+  endEvents,
 
-  addEndEventListener: function addEndEventListener(node, eventListener) {
+  addEndEventListener(node, eventListener) {
     if (endEvents.length === 0) {
       window.setTimeout(eventListener, 0);
       return;
     }
-    endEvents.forEach(function (endEvent) {
+    endEvents.forEach(endEvent => {
       addEventListener(node, endEvent, eventListener);
     });
   },
-  removeEndEventListener: function removeEndEventListener(node, eventListener) {
+
+  removeEndEventListener(node, eventListener) {
     if (endEvents.length === 0) {
       return;
     }
-    endEvents.forEach(function (endEvent) {
+    endEvents.forEach(endEvent => {
       removeEventListener(node, endEvent, eventListener);
     });
-  }
+  },
 };
 
 export default TransitionEvents;

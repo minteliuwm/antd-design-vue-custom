@@ -1,5 +1,4 @@
-import _extends from 'babel-runtime/helpers/extends';
-import defaultLocale from '../locale-provider/default';
+import defaultLocale from '../locale/default';
 
 // export interface ModalLocale {
 //   okText: string;
@@ -7,13 +6,20 @@ import defaultLocale from '../locale-provider/default';
 //   justOkText: string;
 // }
 
-var runtimeLocale = _extends({}, defaultLocale.Modal);
+let runtimeLocale = {
+  ...defaultLocale.Modal,
+};
 
 export function changeConfirmLocale(newLocale) {
   if (newLocale) {
-    runtimeLocale = _extends({}, runtimeLocale, newLocale);
+    runtimeLocale = {
+      ...runtimeLocale,
+      ...newLocale,
+    };
   } else {
-    runtimeLocale = _extends({}, defaultLocale.Modal);
+    runtimeLocale = {
+      ...defaultLocale.Modal,
+    };
   }
 }
 

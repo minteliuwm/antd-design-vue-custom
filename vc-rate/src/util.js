@@ -1,8 +1,8 @@
 function getScroll(w, top) {
-  var ret = top ? w.pageYOffset : w.pageXOffset;
-  var method = top ? 'scrollTop' : 'scrollLeft';
+  let ret = top ? w.pageYOffset : w.pageXOffset;
+  const method = top ? 'scrollTop' : 'scrollLeft';
   if (typeof ret !== 'number') {
-    var d = w.document;
+    const d = w.document;
     // ie6,7,8 standard mode
     ret = d.documentElement[method];
     if (typeof ret !== 'number') {
@@ -14,26 +14,26 @@ function getScroll(w, top) {
 }
 
 function getClientPosition(elem) {
-  var x = void 0;
-  var y = void 0;
-  var doc = elem.ownerDocument;
-  var body = doc.body;
-  var docElem = doc && doc.documentElement;
-  var box = elem.getBoundingClientRect();
+  let x;
+  let y;
+  const doc = elem.ownerDocument;
+  const body = doc.body;
+  const docElem = doc && doc.documentElement;
+  const box = elem.getBoundingClientRect();
   x = box.left;
   y = box.top;
   x -= docElem.clientLeft || body.clientLeft || 0;
   y -= docElem.clientTop || body.clientTop || 0;
   return {
     left: x,
-    top: y
+    top: y,
   };
 }
 
 export function getOffsetLeft(el) {
-  var pos = getClientPosition(el);
-  var doc = el.ownerDocument;
-  var w = doc.defaultView || doc.parentWindow;
+  const pos = getClientPosition(el);
+  const doc = el.ownerDocument;
+  const w = doc.defaultView || doc.parentWindow;
   pos.left += getScroll(w);
   return pos.left;
 }

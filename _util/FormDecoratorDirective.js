@@ -4,7 +4,7 @@ export function antDecorator(Vue) {
 
 export default {
   // just for tag
-  install: function install(Vue) {
+  install: Vue => {
     antDecorator(Vue);
-  }
+  },
 };

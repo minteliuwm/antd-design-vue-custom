@@ -4,7 +4,7 @@
  * @author yiminghe@gmail.com
  */
 
-var KeyCode = {
+const KeyCode = {
   /**
    * MAC_ENTER
    */
@@ -424,17 +424,20 @@ var KeyCode = {
   /**
    * WIN_IME
    */
-  WIN_IME: 229
+  WIN_IME: 229,
 };
 
 /*
  whether text and modified key is entered at the same time.
  */
 KeyCode.isTextModifyingKeyEvent = function isTextModifyingKeyEvent(e) {
-  var keyCode = e.keyCode;
-  if (e.altKey && !e.ctrlKey || e.metaKey ||
-  // Function keys don't generate text
-  keyCode >= KeyCode.F1 && keyCode <= KeyCode.F12) {
+  const keyCode = e.keyCode;
+  if (
+    (e.altKey && !e.ctrlKey) ||
+    e.metaKey ||
+    // Function keys don't generate text
+    (keyCode >= KeyCode.F1 && keyCode <= KeyCode.F12)
+  ) {
     return false;
   }
 

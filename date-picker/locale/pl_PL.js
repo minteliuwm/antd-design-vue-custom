@@ -1,18 +1,19 @@
-import _extends from 'babel-runtime/helpers/extends';
 import CalendarLocale from '../../vc-calendar/src/locale/pl_PL';
 import TimePickerLocale from '../../time-picker/locale/pl_PL';
 
 // Merge into a locale object
-var locale = {
-  lang: _extends({
+const locale = {
+  lang: {
     placeholder: 'Wybierz datę',
-    rangePlaceholder: ['Data początkowa', 'Data końcowa']
-  }, CalendarLocale),
-  timePickerLocale: _extends({}, TimePickerLocale)
+    rangePlaceholder: ['Data początkowa', 'Data końcowa'],
+    ...CalendarLocale,
+  },
+  timePickerLocale: {
+    ...TimePickerLocale,
+  },
 };
 
 // All settings at:
-// https://github.com/ant-design/ant-design/blob/master/components/date-picker/lo
-// cale/example.json
+// https://github.com/ant-design/ant-design/blob/master/components/date-picker/locale/example.json
 
 export default locale;

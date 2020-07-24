@@ -1,29 +1,21 @@
-import _mergeJSXProps from 'babel-helper-vue-jsx-merge-props';
-import _extends from 'babel-runtime/helpers/extends';
 import { cloneElement } from '../../_util/vnode';
 import { canGoNext } from './utils/innerSliderUtils';
 
 function noop() {}
 
-export var PrevArrow = {
+export const PrevArrow = {
   functional: true,
-  clickHandler: function clickHandler(options, handle, e) {
+  clickHandler(options, handle, e) {
     if (e) {
       e.preventDefault();
     }
     handle(options, e);
   },
-  render: function render(createElement, context) {
-    var h = arguments[0];
-    var props = context.props;
-    var clickHandler = props.clickHandler,
-        infinite = props.infinite,
-        currentSlide = props.currentSlide,
-        slideCount = props.slideCount,
-        slidesToShow = props.slidesToShow;
-
-    var prevClasses = { 'slick-arrow': true, 'slick-prev': true };
-    var prevHandler = function prevHandler(e) {
+  render(createElement, context) {
+    const { props } = context;
+    const { clickHandler, infinite, currentSlide, slideCount, slidesToShow } = props;
+    const prevClasses = { 'slick-arrow': true, 'slick-prev': true };
+    let prevHandler = function(e) {
       if (e) {
         e.preventDefault();
       }
@@ -35,65 +27,67 @@ export var PrevArrow = {
       prevHandler = noop;
     }
 
-    var prevArrowProps = {
+    const prevArrowProps = {
       key: '0',
       domProps: {
-        'data-role': 'none'
+        'data-role': 'none',
       },
-      'class': prevClasses,
+      class: prevClasses,
       style: { display: 'block' },
       on: {
-        click: prevHandler
-      }
+        click: prevHandler,
+      },
     };
-    var customProps = {
-      currentSlide: currentSlide,
-      slideCount: slideCount
+    const customProps = {
+      currentSlide,
+      slideCount,
     };
-    var prevArrow = void 0;
+    let prevArrow;
 
     if (props.prevArrow) {
-      prevArrow = cloneElement(props.prevArrow(_extends({}, prevArrowProps, {
-        props: customProps
-      })), {
-        key: '0',
-        'class': prevClasses,
-        style: { display: 'block' },
-        on: {
-          click: prevHandler
-        }
-      });
+      prevArrow = cloneElement(
+        props.prevArrow({
+          ...prevArrowProps,
+          ...{
+            props: customProps,
+          },
+        }),
+        {
+          key: '0',
+          class: prevClasses,
+          style: { display: 'block' },
+          on: {
+            click: prevHandler,
+          },
+        },
+      );
     } else {
-      prevArrow = h(
-        'button',
-        _mergeJSXProps([{ key: '0', attrs: { type: 'button' }
-        }, prevArrowProps]),
-        [' ', 'Previous']
+      prevArrow = (
+        <button key="0" type="button" {...prevArrowProps}>
+          {' '}
+          Previous
+        </button>
       );
     }
 
     return prevArrow;
-  }
+  },
 };
 
-export var NextArrow = {
+export const NextArrow = {
   functional: true,
-  clickHandler: function clickHandler(options, handle, e) {
+  clickHandler(options, handle, e) {
     if (e) {
       e.preventDefault();
     }
     handle(options, e);
   },
-  render: function render(createElement, context) {
-    var h = arguments[0];
-    var props = context.props;
-    var clickHandler = props.clickHandler,
-        currentSlide = props.currentSlide,
-        slideCount = props.slideCount;
+  render(createElement, context) {
+    const { props } = context;
+    const { clickHandler, currentSlide, slideCount } = props;
 
-
-    var nextClasses = { 'slick-arrow': true, 'slick-next': true };
-    var nextHandler = function nextHandler(e) {
+    const nextClasses = { 'slick-arrow': true, 'slick-next': true };
+    let nextHandler = function(e) {
       if (e) {
         e.preventDefault();
       }
@@ -104,43 +98,49 @@ export var NextArrow = {
       nextHandler = noop;
     }
 
-    var nextArrowProps = {
+    const nextArrowProps = {
       key: '1',
       domProps: {
-        'data-role': 'none'
+        'data-role': 'none',
       },
-      'class': nextClasses,
+      class: nextClasses,
       style: { display: 'block' },
       on: {
-        click: nextHandler
-      }
+        click: nextHandler,
+      },
     };
-    var customProps = {
-      currentSlide: currentSlide,
-      slideCount: slideCount
+    const customProps = {
+      currentSlide,
+      slideCount,
     };
-    var nextArrow = void 0;
+    let nextArrow;
 
     if (props.nextArrow) {
-      nextArrow = cloneElement(props.nextArrow(_extends({}, nextArrowProps, {
-        props: customProps
-      })), {
-        key: '1',
-        'class': nextClasses,
-        style: { display: 'block' },
-        on: {
-          click: nextHandler
-        }
-      });
+      nextArrow = cloneElement(
+        props.nextArrow({
+          ...nextArrowProps,
+          ...{
+            props: customProps,
+          },
+        }),
+        {
+          key: '1',
+          class: nextClasses,
+          style: { display: 'block' },
+          on: {
+            click: nextHandler,
+          },
+        },
+      );
     } else {
-      nextArrow = h(
-        'button',
-        _mergeJSXProps([{ key: '1', attrs: { type: 'button' }
-        }, nextArrowProps]),
-        [' ', 'Next']
+      nextArrow = (
+        <button key="1" type="button" {...nextArrowProps}>
+          {' '}
+          Next
+        </button>
       );
     }
 
     return nextArrow;
-  }
+  },
 };

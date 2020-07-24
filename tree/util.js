@@ -1,22 +1,20 @@
-import _toConsumableArray from 'babel-runtime/helpers/toConsumableArray';
 import { getNodeChildren, convertTreeToEntities } from '../vc-tree/src/util';
 import { getSlots } from '../_util/props-util';
 
-var Record = {
+const Record = {
   None: 'node',
   Start: 'start',
-  End: 'end'
+  End: 'end',
 };
 
 // TODO: Move this logic into `rc-tree`
 function traverseNodesKey(rootChildren, callback) {
-  var nodeList = getNodeChildren(rootChildren) || [];
+  const nodeList = getNodeChildren(rootChildren) || [];
 
   function processNode(node) {
-    var key = node.key;
-
-    var children = getSlots(node)['default'];
-    if (callback(key) !== false) {
+    const { key } = node;
+    const children = getSlots(node).default;
+    if (callback(key, node) !== false) {
       traverseNodesKey(typeof children === 'function' ? children() : children, callback);
     }
   }
@@ -25,16 +23,14 @@ function traverseNodesKey(rootChildren, callback) {
 }
 
 export function getFullKeyList(children) {
-  var _convertTreeToEntitie = convertTreeToEntities(children),
-      keyEntities = _convertTreeToEntitie.keyEntities;
-
-  return [].concat(_toConsumableArray(keyEntities.keys()));
+  const { keyEntities } = convertTreeToEntities(children);
+  return [...keyEntities.keys()];
 }
 
 /** 计算选中范围，只考虑expanded情况以优化性能 */
 export function calcRangeKeys(rootChildren, expandedKeys, startKey, endKey) {
-  var keys = [];
-  var record = Record.None;
+  const keys = [];
+  let record = Record.None;
 
   if (startKey && startKey === endKey) {
     return [startKey];
@@ -47,7 +43,7 @@ export function calcRangeKeys(rootChildren, expandedKeys, startKey, endKey) {
     return key === startKey || key === endKey;
   }
 
-  traverseNodesKey(rootChildren, function (key) {
+  traverseNodesKey(rootChildren, key => {
     if (record === Record.End) {
       return false;
     }
@@ -74,5 +70,32 @@ export function calcRangeKeys(rootChildren, expandedKeys, startKey, endKey) {
     return true;
   });
 
+  return keys;
+}
+
+export function convertDirectoryKeysToNodes(rootChildren, keys) {
+  const restKeys = [...keys];
+  const nodes = [];
+  traverseNodesKey(rootChildren, (key, node) => {
+    const index = restKeys.indexOf(key);
+    if (index !== -1) {
+      nodes.push(node);
+      restKeys.splice(index, 1);
+    }
+
+    return !!restKeys.length;
+  });
+  return nodes;
+}
+
+export function getFullKeyListByTreeData(treeData) {
+  let keys = [];
+
+  (treeData || []).forEach(item => {
+    keys.push(item.key);
+    if (item.children) {
+      keys = [...keys, ...getFullKeyListByTreeData(item.children)];
+    }
+  });
   return keys;
 }

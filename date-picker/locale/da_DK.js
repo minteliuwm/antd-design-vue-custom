@@ -1,14 +1,16 @@
-import _extends from 'babel-runtime/helpers/extends';
 import CalendarLocale from '../../vc-calendar/src/locale/da_DK';
 import TimePickerLocale from '../../time-picker/locale/da_DK';
 
 // Merge into a locale object
-var locale = {
-  lang: _extends({
+const locale = {
+  lang: {
     placeholder: 'Vælg dato',
-    rangePlaceholder: ['Startdato', 'Slutdato']
-  }, CalendarLocale),
-  timePickerLocale: _extends({}, TimePickerLocale)
+    rangePlaceholder: ['Startdato', 'Slutdato'],
+    ...CalendarLocale,
+  },
+  timePickerLocale: {
+    ...TimePickerLocale,
+  },
 };
 
 // All settings at:

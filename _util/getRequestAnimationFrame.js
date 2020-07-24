@@ -1,11 +1,11 @@
-var availablePrefixs = ['moz', 'ms', 'webkit'];
+const availablePrefixs = ['moz', 'ms', 'webkit'];
 
 function requestAnimationFramePolyfill() {
-  var lastTime = 0;
-  return function (callback) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var id = window.setTimeout(function () {
+  let lastTime = 0;
+  return function(callback) {
+    const currTime = new Date().getTime();
+    const timeToCall = Math.max(0, 16 - (currTime - lastTime));
+    const id = window.setTimeout(function() {
       callback(currTime + timeToCall);
     }, timeToCall);
     lastTime = currTime + timeToCall;
@@ -15,18 +15,16 @@ function requestAnimationFramePolyfill() {
 
 export default function getRequestAnimationFrame() {
   if (typeof window === 'undefined') {
-    return function () {};
+    return () => {};
   }
   if (window.requestAnimationFrame) {
     // https://github.com/vuejs/vue/issues/4465
     return window.requestAnimationFrame.bind(window);
   }
 
-  var prefix = availablePrefixs.filter(function (key) {
-    return key + 'RequestAnimationFrame' in window;
-  })[0];
+  const prefix = availablePrefixs.filter(key => `${key}RequestAnimationFrame` in window)[0];
 
-  return prefix ? window[prefix + 'RequestAnimationFrame'] : requestAnimationFramePolyfill();
+  return prefix ? window[`${prefix}RequestAnimationFrame`] : requestAnimationFramePolyfill();
 }
 
 export function cancelRequestAnimationFrame(id) {
@@ -36,9 +34,13 @@ export function cancelRequestAnimationFrame(id) {
   if (window.cancelAnimationFrame) {
     return window.cancelAnimationFrame(id);
   }
-  var prefix = availablePrefixs.filter(function (key) {
-    return key + 'CancelAnimationFrame' in window || key + 'CancelRequestAnimationFrame' in window;
-  })[0];
+  const prefix = availablePrefixs.filter(
+    key => `${key}CancelAnimationFrame` in window || `${key}CancelRequestAnimationFrame` in window,
+  )[0];
 
-  return prefix ? (window[prefix + 'CancelAnimationFrame'] || window[prefix + 'CancelRequestAnimationFrame']).call(this, id) : clearTimeout(id);
+  return prefix
+    ? (
+        window[`${prefix}CancelAnimationFrame`] || window[`${prefix}CancelRequestAnimationFrame`]
+      ).call(this, id)
+    : clearTimeout(id);
 }

@@ -23,5 +23,5 @@ export default {
   previousDecade: 'Prejšnje desetletje',
   nextDecade: 'Naslednje desetletje',
   previousCentury: 'Prejšnje stoletje',
-  nextCentury: 'Naslednje stoletje'
+  nextCentury: 'Naslednje stoletje',
 };

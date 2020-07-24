@@ -1,4 +1,3 @@
-import _extends from 'babel-runtime/helpers/extends';
 import Modal, { destroyFns } from './Modal';
 import modalConfirm from './confirm';
 import Icon from '../icon';
@@ -7,64 +6,61 @@ import Base from '../base';
 // export { ActionButtonProps } from './ActionButton'
 // export { ModalProps, ModalFuncProps } from './Modal'
 
-var info = function info(props) {
-  var config = _extends({
+const info = function(props) {
+  const config = {
     type: 'info',
-    icon: function icon(h) {
-      return h(Icon, {
-        attrs: { type: 'info-circle' }
-      });
+    icon: h => {
+      return <Icon type="info-circle" />;
     },
-    okCancel: false
-  }, props);
+    okCancel: false,
+    ...props,
+  };
   return modalConfirm(config);
 };
 
-var success = function success(props) {
-  var config = _extends({
+const success = function(props) {
+  const config = {
     type: 'success',
-    icon: function icon(h) {
-      return h(Icon, {
-        attrs: { type: 'check-circle' }
-      });
+    icon: h => {
+      return <Icon type="check-circle" />;
     },
-    okCancel: false
-  }, props);
+    okCancel: false,
+    ...props,
+  };
   return modalConfirm(config);
 };
 
-var error = function error(props) {
-  var config = _extends({
+const error = function(props) {
+  const config = {
     type: 'error',
-    icon: function icon(h) {
-      return h(Icon, {
-        attrs: { type: 'close-circle' }
-      });
+    icon: h => {
+      return <Icon type="close-circle" />;
     },
-    okCancel: false
-  }, props);
+    okCancel: false,
+    ...props,
+  };
   return modalConfirm(config);
 };
 
-var warning = function warning(props) {
-  var config = _extends({
+const warning = function(props) {
+  const config = {
     type: 'warning',
-    icon: function icon(h) {
-      return h(Icon, {
-        attrs: { type: 'exclamation-circle' }
-      });
+    icon: h => {
+      return <Icon type="exclamation-circle" />;
     },
-    okCancel: false
-  }, props);
+    okCancel: false,
+    ...props,
+  };
   return modalConfirm(config);
 };
-var warn = warning;
+const warn = warning;
 
-var confirm = function confirm(props) {
-  var config = _extends({
+const confirm = function confirmFn(props) {
+  const config = {
     type: 'confirm',
-    okCancel: true
-  }, props);
+    okCancel: true,
+    ...props,
+  };
   return modalConfirm(config);
 };
 Modal.info = info;
@@ -74,9 +70,9 @@ Modal.warning = warning;
 Modal.warn = warn;
 Modal.confirm = confirm;
 
-Modal.destroyAll = function () {
+Modal.destroyAll = function destroyAllFn() {
   while (destroyFns.length) {
-    var close = destroyFns.pop();
+    const close = destroyFns.pop();
     if (close) {
       close();
     }
@@ -84,7 +80,7 @@ Modal.destroyAll = function () {
 };
 
 /* istanbul ignore next */
-Modal.install = function (Vue) {
+Modal.install = function(Vue) {
   Vue.use(Base);
   Vue.component(Modal.name, Modal);
 };
